@@ -1,0 +1,21 @@
+<form class="search" (ngSubmit)="submit()" novalidate>
+  <div class="field" [class.field--invalid]="riotId.invalid && riotId.touched">
+    <svg lucideSearch size="21" strokeWidth="1.8" aria-hidden="true"></svg>
+    <label class="sr-only" for="riot-id">Riot ID</label>
+    <input
+      id="riot-id"
+      [formControl]="riotId"
+      placeholder="Ex.: Faker#KR1"
+      autocomplete="off"
+      spellcheck="false"
+      (keydown.enter)="$event.preventDefault(); submit()"
+    />
+  </div>
+  <button type="button" [disabled]="loading" (click)="submit()">
+    <svg lucideSearch size="18" strokeWidth="2" aria-hidden="true"></svg>
+    <span>{{ loading ? 'Pesquisando…' : 'Pesquisar' }}</span>
+  </button>
+  @if (riotId.invalid && riotId.touched) {
+    <p class="error">Use o formato Nome#TAG para continuar.</p>
+  }
+</form>

@@ -1,0 +1,36 @@
+<article class="match" [class.match--victory]="match.win" [class.match--defeat]="!match.win">
+  <div class="result-cell">
+    <app-status-badge [tone]="match.win ? 'success' : 'danger'" [label]="match.win ? 'Vitória' : 'Derrota'" />
+    <span class="played-at">{{ match.playedAt | date:'dd/MM, HH:mm' }}</span>
+  </div>
+
+  <div class="champion-cell">
+    <img class="champion-icon" [src]="match.assets.championIcon" [alt]="match.champion.name" />
+    <div class="champion-info">
+      <strong>{{ match.champion.name }}</strong>
+      <div class="queue">
+        <app-status-badge [tone]="queueTone()" [label]="match.queueName" />
+        <span><svg lucideClock3 size="12" strokeWidth="1.8" aria-hidden="true"></svg>{{ formatDuration(match.durationSeconds) }}</span>
+      </div>
+    </div>
+    <div class="loadout" aria-label="Runas e feitiços">
+      @for (spell of match.assets.spells; track spell) { <img [src]="spell" alt="Feitiço" /> }
+      @for (rune of match.assets.runes.slice(0, 2); track rune) { <img class="rune" [src]="rune" alt="Runa" /> }
+    </div>
+  </div>
+
+  <div class="stat kda">
+    <span>KDA</span>
+    <strong>{{ match.kda.kills }} <i>/</i> <em>{{ match.kda.deaths }}</em> <i>/</i> {{ match.kda.assists }}</strong>
+    <small>{{ match.kda.ratio }} de média</small>
+  </div>
+
+  <div class="stat"><span>CS</span><strong>{{ match.cs }}</strong><small>farm total</small></div>
+  <div class="stat"><span>Ouro</span><strong>{{ formatNumber(match.gold) }}</strong><small>coletado</small></div>
+  <div class="stat"><span>Dano</span><strong>{{ formatNumber(match.damageToChampions) }}</strong><small>em campeões</small></div>
+
+  <div class="items" aria-label="Itens da partida">
+    @for (item of match.assets.items; track item) { <img [src]="item" alt="Item" /> }
+    @for (slot of [1,2,3,4,5,6,7].slice(match.assets.items.length); track slot) { <i></i> }
+  </div>
+</article>

@@ -1,0 +1,38 @@
+<section class="profile-card">
+  <div class="identity">
+    <div class="avatar-wrap">
+      <img [src]="player.profile.profileIconUrl" [alt]="'Ícone de ' + player.account.gameName" />
+      <span class="level-badge">{{ player.profile.level }}</span>
+    </div>
+    <div class="player-name">
+      <app-status-badge tone="info" label="Perfil verificado" />
+      <h2>{{ player.account.gameName }}<span>#{{ player.account.tagLine }}</span></h2>
+      <p>Nível {{ player.profile.level }} · League of Legends</p>
+    </div>
+  </div>
+
+  <div class="rank-overview">
+    <div class="rank-icon"><svg lucideTrophy size="23" strokeWidth="1.7" aria-hidden="true"></svg></div>
+    <div>
+      <span class="label">Classificação atual</span>
+      <strong>{{ rankLabel() }}</strong>
+    </div>
+    @if (player.rank; as rank) {
+      <div class="lp"><b>{{ rank.leaguePoints }}</b><span>LP</span></div>
+    }
+  </div>
+
+  @if (player.rank; as rank) {
+    <div class="metrics">
+      <div class="metric"><span>Vitórias</span><strong class="positive">{{ rank.wins }}</strong></div>
+      <div class="metric"><span>Derrotas</span><strong class="negative">{{ rank.losses }}</strong></div>
+      <div class="metric metric--featured">
+        <span>Win rate</span>
+        <strong>{{ rank.winRate }}%</strong>
+        <svg lucideTrendingUp size="17" strokeWidth="2" aria-hidden="true"></svg>
+      </div>
+    </div>
+  } @else {
+    <div class="unranked">Este jogador ainda não possui uma classificação nesta temporada.</div>
+  }
+</section>

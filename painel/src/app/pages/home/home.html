@@ -1,0 +1,84 @@
+<header class="topbar">
+  <div class="topbar__content">
+    <a class="brand" href="/" aria-label="Scout.gg - início">
+      <span class="brand-icon"><svg lucideRadar size="21" strokeWidth="1.7" aria-hidden="true"></svg></span>
+      <span>Scout<span>.gg</span></span>
+    </a>
+    <span class="region">BR1 · AMERICAS</span>
+  </div>
+</header>
+
+<main>
+  <section class="hero" [class.hero--compact]="state().status !== 'idle'">
+    <div class="hero-glow" aria-hidden="true"></div>
+    <div class="hero-badge"><svg lucideActivity size="14" strokeWidth="2" aria-hidden="true"></svg>League of Legends Analytics</div>
+    <span class="kicker">Conheça seu campo de batalha</span>
+    <h1>Seu histórico no Rift,<br /><span>revelado.</span></h1>
+    <p>Consulte perfil, elo e desempenho recente usando seu Riot ID.</p>
+    <div class="search-shell">
+      <app-player-search [loading]="state().status === 'loading'" (searchPlayer)="search($event)" />
+    </div>
+  </section>
+
+  <section class="content" aria-live="polite">
+    @if (state().status === 'loading') {
+      <app-ui-state type="loading" />
+    } @else if (state().status === 'error') {
+      <app-ui-state
+        type="error"
+        title="Não foi possível analisar este jogador."
+        [message]="state().errorMessage"
+        (retry)="retry()"
+      />
+    } @else if (state().player; as player) {
+      <div class="results">
+        <app-player-summary [player]="player" />
+        @if (state().status === 'empty') {
+          <app-ui-state
+            type="empty"
+            title="Nenhuma partida recente."
+            message="O perfil foi encontrado, mas não há partidas disponíveis para análise."
+          />
+        } @else {
+          <div class="history-heading">
+            <div>
+              <span class="section-label">Desempenho recente</span>
+              <h2>Histórico de partidas</h2>
+            </div>
+            <span class="match-count">{{ player.matches.length }} partidas analisadas</span>
+          </div>
+          <div class="matches">
+            @for (match of player.matches; track match.id) {
+              <app-match-card [match]="match" />
+            }
+          </div>
+        }
+      </div>
+    } @else {
+      <section class="initial-state" aria-label="Recursos da plataforma">
+        <div class="features">
+          <article>
+            <div class="feature-icon feature-icon--discovery" aria-hidden="true">
+              <svg lucideRadar size="23" strokeWidth="1.5"></svg>
+              <i><svg lucideSearch size="11" strokeWidth="2"></svg></i>
+            </div>
+            <span>01</span><h2>Pesquise um jogador para começar</h2><p>Informe um Riot ID para iniciar uma análise completa.</p>
+          </article>
+          <article>
+            <div class="feature-icon"><svg lucideUserRoundSearch size="20" strokeWidth="1.6" aria-hidden="true"></svg></div>
+            <span>02</span><h2>Perfil completo</h2><p>Nível, ranking e aproveitamento em um só lugar.</p>
+          </article>
+          <article>
+            <div class="feature-icon"><svg lucideChartNoAxesColumnIncreasing size="20" strokeWidth="1.6" aria-hidden="true"></svg></div>
+            <span>03</span><h2>Partidas recentes</h2><p>KDA, farm, dano, build, runas e feitiços.</p>
+          </article>
+        </div>
+      </section>
+    }
+  </section>
+</main>
+
+<footer>
+  <div><span>Scout.gg</span><p>Dados fornecidos pela Riot API e Data Dragon.</p></div>
+  <small>Scout.gg não é endossado pela Riot Games.</small>
+</footer>

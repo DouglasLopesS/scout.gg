@@ -1,0 +1,31 @@
+@if (type === 'loading') {
+  <section class="skeleton" role="status" aria-label="Carregando dados do jogador">
+    <div class="skeleton-profile">
+      <i class="skeleton-avatar"></i>
+      <div class="skeleton-lines"><i></i><i></i><i></i></div>
+      <div class="skeleton-metrics"><i></i><i></i><i></i></div>
+    </div>
+    @for (row of [1, 2, 3, 4]; track row) {
+      <div class="skeleton-match"><i></i><div><i></i><i></i></div><i></i><i></i><i></i></div>
+    }
+  </section>
+} @else {
+  <section class="state" [class.state--error]="type === 'error'" role="status">
+    @if (type === 'empty') {
+      <div class="illustration" aria-hidden="true">
+        <svg class="radar" lucideRadar size="52" strokeWidth="1.25"></svg>
+        <span><svg lucideSearch size="19" strokeWidth="1.8"></svg></span>
+      </div>
+      <h2>{{ title || 'Pesquise um jogador para começar.' }}</h2>
+      <p>{{ message || 'Use um Riot ID para visualizar perfil, ranking e desempenho recente.' }}</p>
+    } @else {
+      <div class="error-icon"><svg lucideCircleAlert size="27" strokeWidth="1.7" aria-hidden="true"></svg></div>
+      <h2>{{ title || 'Jogador não encontrado.' }}</h2>
+      <p>{{ message || 'Verifique o Riot ID informado e tente novamente.' }}</p>
+      <button type="button" (click)="retry.emit()">
+        <svg lucideRefreshCw size="16" strokeWidth="2" aria-hidden="true"></svg>
+        Tentar novamente
+      </button>
+    }
+  </section>
+}
