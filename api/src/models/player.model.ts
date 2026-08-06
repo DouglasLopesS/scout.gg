@@ -38,5 +38,11 @@ export interface PlayerResponse {
     winRate: number;
   } | null;
   matches: PlayerMatch[];
+  hasMoreMatches: boolean;
   dataDragonVersion: string;
+}
+
+export interface PlayerMatchesPage {
+  matches: PlayerMatch[];
+  hasMore: boolean;
 }

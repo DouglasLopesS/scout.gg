@@ -1,0 +1,7 @@
+<div class="load-more">
+  <button type="button" [disabled]="loading" (click)="loadMore.emit()">
+    @if (loading) { <i aria-hidden="true"></i> Carregando partidas... }
+    @else { Carregar mais }
+  </button>
+  @if (errorMessage) { <p role="alert">{{ errorMessage }}</p> }
+</div>

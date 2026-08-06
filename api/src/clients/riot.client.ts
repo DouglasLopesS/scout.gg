@@ -52,10 +52,10 @@ export class RiotClient {
     ));
   }
 
-  async getMatchIds(puuid: string, count = 10): Promise<string[]> {
+  async getMatchIds(puuid: string, start = 0, count = 10): Promise<string[]> {
     return this.request(() => this.regionalClient.get<string[]>(
       `/lol/match/v5/matches/by-puuid/${encodeURIComponent(puuid)}/ids`,
-      { params: { start: 0, count } }
+      { params: { start, count } }
     ));
   }
 

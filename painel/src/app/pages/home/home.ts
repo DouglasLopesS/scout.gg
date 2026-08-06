@@ -3,6 +3,7 @@ import { Component, inject, signal } from '@angular/core';
 import { LucideActivity, LucideChartNoAxesColumnIncreasing, LucideRadar, LucideSearch, LucideUserRoundSearch } from '@lucide/angular';
 import { MatchCard } from '../../components/match-card/match-card';
 import { MatchDetailsPanel } from '../../components/match-details-panel/match-details-panel';
+import { LoadMoreButton } from '../../components/load-more-button/load-more-button';
 import { PlayerSearch } from '../../components/player-search/player-search';
 import { PlayerSummary } from '../../components/player-summary/player-summary';
 import { UiState } from '../../components/ui-state/ui-state';
@@ -20,6 +21,7 @@ import { PlayerService } from '../../services/player.service';
     LucideUserRoundSearch,
     MatchCard,
     MatchDetailsPanel,
+    LoadMoreButton,
     PlayerSearch,
     PlayerSummary,
     UiState
@@ -33,9 +35,13 @@ export class Home {
 
   readonly state = signal<SearchState>({ status: 'idle', player: null, errorMessage: '' });
   readonly selectedMatchId = signal<string | null>(null);
+  readonly loadingMore = signal(false);
+  readonly loadMoreError = signal('');
 
   search(riotId: { gameName: string; tagLine: string }): void {
     this.selectedMatchId.set(null);
+    this.loadingMore.set(false);
+    this.loadMoreError.set('');
     this.lastSearch = riotId;
     this.state.set({ status: 'loading', player: null, errorMessage: '' });
     this.playerService.findByRiotId(riotId.gameName, riotId.tagLine)
@@ -61,6 +67,36 @@ export class Home {
 
   closeMatch(): void {
     this.selectedMatchId.set(null);
+  }
+
+  loadMore(): void {
+    const player = this.state().player;
+    if (!player || !player.hasMoreMatches || this.loadingMore()) return;
+
+    this.loadingMore.set(true);
+    this.loadMoreError.set('');
+    this.playerService.findMatches(player.account.puuid, player.matches.length).subscribe({
+      next: (page) => {
+        this.state.update((current) => {
+          if (!current.player) return current;
+          const loadedIds = new Set(current.player.matches.map(({ id }) => id));
+          const newMatches = page.matches.filter(({ id }) => !loadedIds.has(id));
+          return {
+            ...current,
+            player: {
+              ...current.player,
+              matches: [...current.player.matches, ...newMatches],
+              hasMoreMatches: page.hasMore
+            }
+          };
+        });
+        this.loadingMore.set(false);
+      },
+      error: (error: unknown) => {
+        this.loadMoreError.set(this.getErrorMessage(error));
+        this.loadingMore.set(false);
+      }
+    });
   }
 
   private getErrorMessage(error: unknown): string {

@@ -40,7 +40,13 @@ export interface Player {
   profile: { summonerId: string; level: number; profileIconId: number; profileIconUrl: string };
   rank: PlayerRank | null;
   matches: PlayerMatch[];
+  hasMoreMatches: boolean;
   dataDragonVersion: string;
+}
+
+export interface PlayerMatchesPage {
+  matches: PlayerMatch[];
+  hasMore: boolean;
 }
 
 export interface ApiErrorResponse {

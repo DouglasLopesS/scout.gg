@@ -2,7 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { Observable, timeout } from 'rxjs';
 import { environment } from '../../environments/environment';
-import type { Player } from '../models/player.model';
+import type { Player, PlayerMatchesPage } from '../models/player.model';
 
 @Injectable({ providedIn: 'root' })
 export class PlayerService {
@@ -14,6 +14,14 @@ export class PlayerService {
     const url = `${environment.apiUrl}/player/${name}/${tag}`;
     return this.http.get<Player>(url).pipe(
       timeout(20_000)
+    );
+  }
+
+  findMatches(puuid: string, start: number, count = 10): Observable<PlayerMatchesPage> {
+    const id = encodeURIComponent(puuid);
+    const url = `${environment.apiUrl}/player/${id}/matches`;
+    return this.http.get<PlayerMatchesPage>(url, { params: { start, count } }).pipe(
+      timeout(30_000)
     );
   }
 }

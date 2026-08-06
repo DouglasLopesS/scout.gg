@@ -1,6 +1,6 @@
 import { DataDragonClient, type DataDragonCatalog } from '../clients/data-dragon.client.js';
 import { RiotClient } from '../clients/riot.client.js';
-import type { PlayerMatch, PlayerResponse } from '../models/player.model.js';
+import type { PlayerMatch, PlayerMatchesPage, PlayerResponse } from '../models/player.model.js';
 import type { RiotLeagueEntryDto, RiotMatchDto, RiotParticipantDto } from '../types/riot.types.js';
 import { AppError } from '../utils/app-error.js';
 import { getQueueName } from '../utils/queue-names.js';
@@ -15,12 +15,13 @@ export class PlayerService {
     const account = await this.riotClient.getAccountByRiotId(gameName, tagLine);
     const [summoner, matchIds, dataDragonVersion] = await Promise.all([
       this.riotClient.getSummonerByPuuid(account.puuid),
-      this.riotClient.getMatchIds(account.puuid),
+      this.riotClient.getMatchIds(account.puuid, 0, 11),
       this.dataDragonClient.getLatestVersion()
     ]);
+    const visibleMatchIds = matchIds.slice(0, 10);
     const [entries, matchDtos, catalog] = await Promise.all([
       this.riotClient.getLeagueEntries(account.puuid),
-      Promise.all(matchIds.map((id) => this.riotClient.getMatch(id))),
+      Promise.all(visibleMatchIds.map((id) => this.riotClient.getMatch(id))),
       this.dataDragonClient.getCatalog(dataDragonVersion)
     ]);
 
@@ -34,7 +35,25 @@ export class PlayerService {
       },
       rank: this.mapRank(entries),
       matches: matchDtos.map((match) => this.mapMatch(match, account.puuid, dataDragonVersion, catalog)),
+      hasMoreMatches: matchIds.length > visibleMatchIds.length,
       dataDragonVersion
+    };
+  }
+
+  async findMatches(puuid: string, start: number, count: number): Promise<PlayerMatchesPage> {
+    const [matchIds, dataDragonVersion] = await Promise.all([
+      this.riotClient.getMatchIds(puuid, start, count + 1),
+      this.dataDragonClient.getLatestVersion()
+    ]);
+    const visibleMatchIds = matchIds.slice(0, count);
+    const [matchDtos, catalog] = await Promise.all([
+      Promise.all(visibleMatchIds.map((id) => this.riotClient.getMatch(id))),
+      this.dataDragonClient.getCatalog(dataDragonVersion)
+    ]);
+
+    return {
+      matches: matchDtos.map((match) => this.mapMatch(match, puuid, dataDragonVersion, catalog)),
+      hasMore: matchIds.length > visibleMatchIds.length
     };
   }
 

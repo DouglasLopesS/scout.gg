@@ -62,6 +62,13 @@
                 />
               }
             }
+            @if (player.hasMoreMatches) {
+              <app-load-more-button
+                [loading]="loadingMore()"
+                [errorMessage]="loadMoreError()"
+                (loadMore)="loadMore()"
+              />
+            }
           </div>
         }
       </div>
