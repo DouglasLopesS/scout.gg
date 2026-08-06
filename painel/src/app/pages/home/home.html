@@ -49,7 +49,18 @@
           </div>
           <div class="matches">
             @for (match of player.matches; track match.id) {
-              <app-match-card [match]="match" />
+              <app-match-card
+                [match]="match"
+                [selected]="selectedMatchId() === match.id"
+                (viewDetails)="openMatch($event)"
+              />
+              @if (selectedMatchId() === match.id) {
+                <app-match-details-panel
+                  [matchId]="match.id"
+                  [playerPuuid]="player.account.puuid"
+                  (closed)="closeMatch()"
+                />
+              }
             }
           </div>
         }

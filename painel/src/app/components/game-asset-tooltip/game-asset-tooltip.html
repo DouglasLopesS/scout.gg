@@ -1,0 +1,16 @@
+<button
+  class="trigger"
+  type="button"
+  [attr.aria-describedby]="tooltipId"
+  [attr.aria-expanded]="open"
+  (click)="toggle($event)"
+>
+  <ng-content />
+</button>
+<div class="tooltip" [class.tooltip--open]="open" [id]="tooltipId" role="tooltip">
+  <strong>{{ title }}</strong>
+  @if (description) { <p>{{ description }}</p> }
+  @if (metadata.length) {
+    <ul>@for (entry of metadata; track entry) { <li>{{ entry }}</li> }</ul>
+  }
+</div>

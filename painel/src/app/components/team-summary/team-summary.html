@@ -1,0 +1,14 @@
+<section class="team" [class.team--blue]="team.side === 'blue'" [class.team--red]="team.side === 'red'" [class.team--mirrored]="mirrored">
+  <div class="team-heading">
+    <div><span class="team-mark"></span><strong>Equipe {{ team.side === 'blue' ? 'azul' : 'vermelha' }}</strong></div>
+    <app-status-badge [tone]="team.win ? 'success' : 'danger'" [label]="team.win ? 'Vitória' : 'Derrota'" />
+  </div>
+  <div class="metrics">
+    <span title="Abates"><svg lucideSkull size="14" aria-hidden="true"></svg><b>{{ team.kills }}</b><small>Kills</small></span>
+    <span title="Ouro"><svg lucideCoins size="14" aria-hidden="true"></svg><b>{{ formatNumber(team.gold) }}</b><small>Ouro</small></span>
+    <span title="Torres"><svg lucideTowerControl size="14" aria-hidden="true"></svg><b>{{ team.objectives.towers }}</b><small>Torres</small></span>
+    <span title="Dragões"><svg lucideFlame size="14" aria-hidden="true"></svg><b>{{ team.objectives.dragons }}</b><small>Dragões</small></span>
+    <span title="Barões e arautos"><svg lucideCrown size="14" aria-hidden="true"></svg><b>{{ team.objectives.barons }}/{{ team.objectives.riftHeralds }}</b><small>Barão/Arauto</small></span>
+    <span title="Inibidores"><svg lucideLandmark size="14" aria-hidden="true"></svg><b>{{ team.objectives.inhibitors }}</b><small>Inibidores</small></span>
+  </div>
+</section>

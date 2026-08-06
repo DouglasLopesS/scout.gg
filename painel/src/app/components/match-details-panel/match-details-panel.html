@@ -1,0 +1,73 @@
+<section
+  class="details-dropdown"
+  [id]="'match-details-' + matchId"
+  aria-label="Análise da partida"
+  aria-live="polite"
+>
+  @if (state() === 'loading') {
+    <div class="skeleton" role="status" aria-label="Carregando detalhes da partida">
+      <div class="skeleton-summary"><i></i><i></i><i></i></div>
+      <div class="skeleton-teams">
+        @for (team of [1, 2]; track team) {
+          <div class="skeleton-column">
+            <div class="skeleton-team"></div>
+            @for (row of [1, 2, 3, 4, 5]; track row) { <div class="skeleton-row"></div> }
+          </div>
+        }
+      </div>
+      <span class="sr-only">Carregando detalhes da partida...</span>
+    </div>
+  } @else if (state() === 'error') {
+    <section class="error-state" role="alert">
+      <span>Não foi possível abrir esta partida</span>
+      <p>{{ errorMessage() }}</p>
+      <button type="button" (click)="retry()"><svg lucideRotateCcw size="15" aria-hidden="true"></svg>Tentar novamente</button>
+    </section>
+  } @else if (details(); as currentDetails) {
+    @if (catalog(); as currentCatalog) {
+      <div class="details-content">
+        @if (team('blue'); as blueTeam) {
+          @if (team('red'); as redTeam) {
+            <div class="versus-header">
+              <app-team-summary [team]="blueTeam" />
+              <section class="match-overview">
+                @if (searchedPlayer(); as player) {
+                  <app-status-badge [tone]="player.win ? 'success' : 'danger'" [label]="player.win ? 'Vitória' : 'Derrota'" />
+                }
+                <strong>{{ currentDetails.queueName }}</strong>
+                <span><svg lucideClock3 size="12" aria-hidden="true"></svg>{{ formatDuration(currentDetails.durationSeconds) }}</span>
+                <small>{{ currentDetails.playedAt | date:'dd/MM/yyyy, HH:mm' }}</small>
+                <small>Versão {{ currentDetails.gameVersion }}</small>
+              </section>
+              <app-team-summary [team]="redTeam" [mirrored]="true" />
+            </div>
+
+            <div class="matchups">
+              @for (index of [0, 1, 2, 3, 4]; track index) {
+                <div class="matchup-row">
+                  @if (participants(blueTeam.teamId)[index]; as bluePlayer) {
+                    <app-participant-row
+                      [participant]="bluePlayer"
+                      [version]="currentDetails.dataDragonVersion"
+                      [catalog]="currentCatalog"
+                      [highlighted]="bluePlayer.puuid === playerPuuid"
+                    />
+                  }
+                  @if (participants(redTeam.teamId)[index]; as redPlayer) {
+                    <app-participant-row
+                      [participant]="redPlayer"
+                      [version]="currentDetails.dataDragonVersion"
+                      [catalog]="currentCatalog"
+                      [highlighted]="redPlayer.puuid === playerPuuid"
+                      [mirrored]="true"
+                    />
+                  }
+                </div>
+              }
+            </div>
+          }
+        }
+      </div>
+    }
+  }
+</section>

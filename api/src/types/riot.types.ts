@@ -31,6 +31,9 @@ export interface RiotPerkStyleDto {
 
 export interface RiotParticipantDto {
   puuid: string;
+  riotIdGameName?: string;
+  riotIdTagline?: string;
+  teamId: number;
   championId: number;
   championName: string;
   champLevel: number;
@@ -42,6 +45,9 @@ export interface RiotParticipantDto {
   neutralMinionsKilled: number;
   goldEarned: number;
   totalDamageDealtToChampions: number;
+  visionScore: number;
+  wardsPlaced: number;
+  wardsKilled: number;
   summoner1Id: number;
   summoner2Id: number;
   item0: number;
@@ -57,6 +63,25 @@ export interface RiotParticipantDto {
   };
 }
 
+export interface RiotObjectiveDto {
+  first: boolean;
+  kills: number;
+}
+
+export interface RiotTeamDto {
+  teamId: number;
+  win: boolean;
+  objectives: {
+    baron?: RiotObjectiveDto;
+    champion?: RiotObjectiveDto;
+    dragon?: RiotObjectiveDto;
+    horde?: RiotObjectiveDto;
+    inhibitor?: RiotObjectiveDto;
+    riftHerald?: RiotObjectiveDto;
+    tower?: RiotObjectiveDto;
+  };
+}
+
 export interface RiotMatchDto {
   metadata: { matchId: string; participants: string[] };
   info: {
@@ -68,5 +93,6 @@ export interface RiotMatchDto {
     gameVersion: string;
     queueId: number;
     participants: RiotParticipantDto[];
+    teams: RiotTeamDto[];
   };
 }

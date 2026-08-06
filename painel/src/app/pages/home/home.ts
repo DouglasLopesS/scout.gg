@@ -2,6 +2,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { Component, inject, signal } from '@angular/core';
 import { LucideActivity, LucideChartNoAxesColumnIncreasing, LucideRadar, LucideSearch, LucideUserRoundSearch } from '@lucide/angular';
 import { MatchCard } from '../../components/match-card/match-card';
+import { MatchDetailsPanel } from '../../components/match-details-panel/match-details-panel';
 import { PlayerSearch } from '../../components/player-search/player-search';
 import { PlayerSummary } from '../../components/player-summary/player-summary';
 import { UiState } from '../../components/ui-state/ui-state';
@@ -18,6 +19,7 @@ import { PlayerService } from '../../services/player.service';
     LucideSearch,
     LucideUserRoundSearch,
     MatchCard,
+    MatchDetailsPanel,
     PlayerSearch,
     PlayerSummary,
     UiState
@@ -30,8 +32,10 @@ export class Home {
   private lastSearch: { gameName: string; tagLine: string } | null = null;
 
   readonly state = signal<SearchState>({ status: 'idle', player: null, errorMessage: '' });
+  readonly selectedMatchId = signal<string | null>(null);
 
   search(riotId: { gameName: string; tagLine: string }): void {
+    this.selectedMatchId.set(null);
     this.lastSearch = riotId;
     this.state.set({ status: 'loading', player: null, errorMessage: '' });
     this.playerService.findByRiotId(riotId.gameName, riotId.tagLine)
@@ -49,6 +53,14 @@ export class Home {
 
   retry(): void {
     if (this.lastSearch) this.search(this.lastSearch);
+  }
+
+  openMatch(matchId: string): void {
+    this.selectedMatchId.update((selected) => selected === matchId ? null : matchId);
+  }
+
+  closeMatch(): void {
+    this.selectedMatchId.set(null);
   }
 
   private getErrorMessage(error: unknown): string {

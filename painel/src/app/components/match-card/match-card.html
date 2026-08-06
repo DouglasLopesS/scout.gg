@@ -1,4 +1,17 @@
-<article class="match" [class.match--victory]="match.win" [class.match--defeat]="!match.win">
+<article
+  class="match"
+  [class.match--victory]="match.win"
+  [class.match--defeat]="!match.win"
+  [class.match--selected]="selected"
+  role="button"
+  tabindex="0"
+  [attr.aria-expanded]="selected"
+  [attr.aria-controls]="selected ? 'match-details-' + match.id : null"
+  [attr.aria-label]="'Ver detalhes da partida com ' + match.champion.name"
+  (click)="openDetails()"
+  (keydown.enter)="openDetails()"
+  (keydown.space)="$event.preventDefault(); openDetails()"
+>
   <div class="result-cell">
     <app-status-badge [tone]="match.win ? 'success' : 'danger'" [label]="match.win ? 'Vitória' : 'Derrota'" />
     <span class="played-at">{{ match.playedAt | date:'dd/MM, HH:mm' }}</span>
@@ -33,4 +46,5 @@
     @for (item of match.assets.items; track item) { <img [src]="item" alt="Item" /> }
     @for (slot of [1,2,3,4,5,6,7].slice(match.assets.items.length); track slot) { <i></i> }
   </div>
+  <span class="details-hint">Ver detalhes <svg lucideChevronRight size="13" aria-hidden="true"></svg></span>
 </article>

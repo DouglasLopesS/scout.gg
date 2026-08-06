@@ -5,8 +5,11 @@ import { DataDragonClient } from './clients/data-dragon.client.js';
 import { RiotClient } from './clients/riot.client.js';
 import type { AppConfig } from './config/env.js';
 import { PlayerController } from './controllers/player.controller.js';
+import { MatchDetailsController } from './controllers/match-details.controller.js';
 import { errorHandler, notFoundHandler } from './middlewares/error.middleware.js';
 import { createPlayerRouter } from './routes/player.routes.js';
+import { createMatchDetailsRouter } from './routes/match-details.routes.js';
+import { MatchDetailsService } from './services/match-details.service.js';
 import { PlayerService } from './services/player.service.js';
 
 export const createApp = (config: AppConfig): Express => {
@@ -14,7 +17,9 @@ export const createApp = (config: AppConfig): Express => {
   const riotClient = new RiotClient(config.riot);
   const dataDragonClient = new DataDragonClient();
   const playerService = new PlayerService(riotClient, dataDragonClient);
+  const matchDetailsService = new MatchDetailsService(riotClient, dataDragonClient);
   const playerController = new PlayerController(playerService);
+  const matchDetailsController = new MatchDetailsController(matchDetailsService);
 
   app.disable('x-powered-by');
   app.use(helmet({ crossOriginResourcePolicy: false }));
@@ -23,6 +28,7 @@ export const createApp = (config: AppConfig): Express => {
 
   app.get('/health', (_request, response) => response.json({ status: 'ok' }));
   app.use('/player', createPlayerRouter(playerController));
+  app.use('/matches', createMatchDetailsRouter(matchDetailsController));
   app.use(notFoundHandler);
   app.use(errorHandler);
 

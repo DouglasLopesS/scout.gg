@@ -1,0 +1,38 @@
+<article
+  class="participant"
+  [class.participant--highlighted]="highlighted"
+  [class.participant--mirrored]="mirrored"
+>
+  <div class="identity">
+    <div class="champion">
+      <img [src]="championIcon" [alt]="participant.championName" />
+      <span>{{ participant.championLevel }}</span>
+    </div>
+    <div class="player-name"><strong>{{ riotId }}</strong><small>{{ participant.championName }}</small></div>
+    <div class="setup">
+      <div>
+        <app-summoner-spell-icon [spellId]="participant.summonerSpell1Id" [catalog]="catalog" />
+        <app-summoner-spell-icon [spellId]="participant.summonerSpell2Id" [catalog]="catalog" />
+      </div>
+      <div>
+        <app-rune-icon [runeId]="participant.primaryRuneId" [catalog]="catalog" />
+        <app-rune-icon [runeId]="participant.secondaryRuneStyleId" [catalog]="catalog" />
+      </div>
+    </div>
+  </div>
+  <div class="performance">
+    <strong class="kda">{{ participant.kills }} <em>/</em> <i>{{ participant.deaths }}</i> <em>/</em> {{ participant.assists }}</strong>
+    <span>{{ participant.kda }} KDA</span>
+    <small>{{ participant.totalCs }} CS · {{ formatNumber(participant.goldEarned) }} ouro</small>
+    <small>{{ formatNumber(participant.totalDamageDealtToChampions) }} dano · Visão {{ participant.visionScore }}</small>
+    <small>{{ participant.wardsPlaced }} wards · {{ participant.wardsKilled }} removidas</small>
+  </div>
+  <div class="items" data-label="Itens">
+    <div class="main-items">
+      @for (itemId of mainItemIds; track $index) { <app-item-icon [itemId]="itemId" [catalog]="catalog" /> }
+    </div>
+    <div class="trinket" aria-label="Item de visão">
+      <app-item-icon [itemId]="trinketId" [catalog]="catalog" />
+    </div>
+  </div>
+</article>

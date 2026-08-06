@@ -1,0 +1,16 @@
+.team { --team: #6785a4; padding: 14px 15px; }
+.team--blue { --team: #3abff8; }
+.team--red { --team: #ef6b6b; }
+.team-heading, .team-heading > div { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.team-heading > div { justify-content: flex-start; }
+.team-mark { width: 7px; height: 7px; border-radius: 50%; background: var(--team); box-shadow: 0 0 8px color-mix(in srgb, var(--team) 60%, transparent); }
+.team-heading strong { color: var(--text); font-family: var(--font-display); font-size: 18px; font-weight: 500; text-transform: capitalize; }
+.metrics { display: grid; grid-template-columns: repeat(6,minmax(48px,1fr)); gap: 7px; margin-top: 12px; }
+.metrics > span { display: grid; grid-template-columns: 17px 1fr; align-items: center; min-width: 0; min-height: 38px; padding: 7px; border-radius: 8px; background: rgba(255,255,255,.03); }
+.metrics svg { grid-row: 1 / 3; color: var(--team); }
+.metrics b { overflow: hidden; color: var(--text); font-size: 13px; text-overflow: ellipsis; white-space: nowrap; }
+.metrics small { overflow: hidden; color: var(--text-discreet); font-size: 9px; line-height: 1.3; text-overflow: ellipsis; text-transform: uppercase; white-space: nowrap; }
+.team--mirrored .team-heading { flex-direction: row-reverse; }
+.team--mirrored .team-heading > div { flex-direction: row-reverse; }
+@media (max-width: 1050px) { .metrics { grid-template-columns: repeat(3,1fr); } }
+@media (max-width: 760px) { .team--mirrored .team-heading, .team--mirrored .team-heading > div { flex-direction: row; } }

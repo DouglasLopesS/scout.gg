@@ -1,0 +1,10 @@
+:host { position: relative; display: inline-flex; }
+.trigger { display: inline-flex; margin: 0; padding: 0; border: 0; border-radius: 6px; background: transparent; cursor: help; }
+.trigger:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+.tooltip { position: absolute; z-index: 60; bottom: calc(100% + 9px); left: 50%; width: min(270px, 72vw); padding: 12px; transform: translate(-50%, 5px); border: 1px solid var(--border-strong); border-radius: 10px; background: #06111a; color: var(--text); box-shadow: 0 15px 38px rgba(0, 0, 0, .42); opacity: 0; visibility: hidden; pointer-events: none; transition: opacity .16s ease, transform .16s ease, visibility .16s ease; }
+:host(:hover) .tooltip, :host(:focus-within) .tooltip, .tooltip--open { transform: translate(-50%, 0); opacity: 1; visibility: visible; }
+.tooltip strong { display: block; color: #f0d58a; font-family: var(--font-display); font-size: 15px; font-weight: 500; }
+.tooltip p { margin: 7px 0 0; color: var(--muted); font-size: 12px; line-height: 1.5; }
+.tooltip ul { display: flex; flex-wrap: wrap; gap: 4px 8px; margin: 8px 0 0; padding: 8px 0 0; border-top: 1px solid var(--border); list-style: none; }
+.tooltip li { color: var(--text-secondary); font-size: 11px; }
+@media (max-width: 720px) { .tooltip { position: fixed; right: 14px; bottom: 16px; left: 14px; width: auto; transform: translateY(5px); } :host(:hover) .tooltip, :host(:focus-within) .tooltip, .tooltip--open { transform: translateY(0); } }

@@ -13,11 +13,14 @@
   box-shadow: var(--shadow-card);
   transition: transform .2s ease, border-color .2s ease, background .2s ease;
   animation: fade-in .4s ease both;
+  cursor: pointer;
 }
 .match::before { content: ''; position: absolute; inset: 12px auto 12px 0; width: 2px; border-radius: 2px; background: var(--result); opacity: .8; }
 .match--victory { --result: var(--success); }
 .match--defeat { --result: var(--danger); }
 .match:hover { transform: translateY(-2px); border-color: var(--border-strong); background: var(--card-highlight); }
+.match--selected { border-color: rgba(201,168,76,.4); background: var(--card-highlight); }
+.match:focus-visible { outline: 2px solid var(--primary); outline-offset: 3px; border-color: var(--border-strong); }
 .result-cell { display: flex; flex-direction: column; align-items: flex-start; gap: 8px; }
 .played-at { color: var(--text-discreet); font-size: 10px; }
 .champion-cell { display: grid; grid-template-columns: 52px minmax(0, 1fr) auto; gap: 12px; align-items: center; }
@@ -38,6 +41,8 @@
 .kda strong em { color: #fb7777; font-style: normal; }
 .items { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 4px; }
 .items img, .items i { width: 28px; height: 28px; border: 1px solid rgba(255, 255, 255, .035); border-radius: 7px; background: rgba(255, 255, 255, .035); object-fit: cover; }
+.details-hint { position: absolute; right: 17px; bottom: 5px; display: inline-flex; align-items: center; gap: 2px; color: var(--text-discreet); font-size: 8px; opacity: 0; transform: translateX(-4px); transition: opacity .16s ease, transform .16s ease; }
+.match:hover .details-hint, .match:focus-visible .details-hint { opacity: 1; transform: translateX(0); }
 @keyframes fade-in { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
 @media (max-width: 1120px) {
   .match { grid-template-columns: 100px minmax(225px, 1.4fr) 110px 66px 80px minmax(170px, 1fr); }
@@ -53,5 +58,6 @@
   .champion-cell { grid-column: 1 / 3; }
   .kda { grid-column: 1; }
   .items { grid-column: 2; max-width: 130px; }
+  .details-hint { display: none; }
 }
 @media (max-width: 430px) { .loadout { display: none; } .items img, .items i { width: 25px; height: 25px; } }

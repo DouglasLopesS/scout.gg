@@ -1,0 +1,7 @@
+@if (item; as asset) {
+  <app-game-asset-tooltip [title]="asset.name" [description]="asset.description" [metadata]="metadata">
+    <img [src]="asset.iconUrl" [alt]="asset.name" />
+  </app-game-asset-tooltip>
+} @else {
+  <span class="empty" aria-hidden="true"></span>
+}

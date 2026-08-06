@@ -62,16 +62,19 @@ export class RiotClient {
   async getMatch(matchId: string): Promise<RiotMatchDto> {
     return this.request(() => this.regionalClient.get<RiotMatchDto>(
       `/lol/match/v5/matches/${encodeURIComponent(matchId)}`
-    ));
+    ), { message: 'Partida não encontrada.', code: 'MATCH_NOT_FOUND' });
   }
 
-  private async request<T>(call: () => Promise<{ data: T }>): Promise<T> {
+  private async request<T>(
+    call: () => Promise<{ data: T }>,
+    notFound = FRIENDLY_ERRORS[404]
+  ): Promise<T> {
     try {
       return (await call()).data;
     } catch (error: unknown) {
       if (error instanceof AxiosError) {
         const status = error.response?.status ?? 503;
-        const friendly = FRIENDLY_ERRORS[status];
+        const friendly = status === 404 ? notFound : FRIENDLY_ERRORS[status];
         if (friendly) {
           throw new AppError(status, friendly.message, friendly.code);
         }
