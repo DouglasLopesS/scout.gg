@@ -10,6 +10,11 @@ import { LucideSearch } from '@lucide/angular';
 })
 export class PlayerSearch {
   @Input() loading = false;
+  @Input() set value(value: string) {
+    if (value && value !== this.riotId.value) {
+      this.riotId.setValue(value, { emitEvent: false });
+    }
+  }
   @Output() readonly searchPlayer = new EventEmitter<{ gameName: string; tagLine: string }>();
 
   readonly riotId = new FormControl('', {

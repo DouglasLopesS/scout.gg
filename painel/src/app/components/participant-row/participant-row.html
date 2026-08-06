@@ -2,13 +2,23 @@
   class="participant"
   [class.participant--highlighted]="highlighted"
   [class.participant--mirrored]="mirrored"
+  [class.participant--selectable]="participant.riotIdTagline"
+  (click)="selectFromRow($event)"
 >
   <div class="identity">
-    <div class="champion">
-      <img [src]="championIcon" [alt]="participant.championName" />
-      <span>{{ participant.championLevel }}</span>
-    </div>
-    <div class="player-name"><strong>{{ riotId }}</strong><small>{{ participant.championName }}</small></div>
+    <button
+      class="profile-link"
+      type="button"
+      [disabled]="!participant.riotIdTagline"
+      [attr.aria-label]="'Consultar perfil de ' + riotId"
+      (click)="openPlayer()"
+    >
+      <span class="champion">
+        <img [src]="championIcon" [alt]="participant.championName" />
+        <span>{{ participant.championLevel }}</span>
+      </span>
+      <span class="player-name"><strong>{{ riotId }}</strong><small>{{ participant.championName }}</small></span>
+    </button>
     <div class="setup">
       <div>
         <app-summoner-spell-icon [spellId]="participant.summonerSpell1Id" [catalog]="catalog" />

@@ -1,20 +1,22 @@
 .participant { display: grid; grid-template-columns: minmax(220px,1.35fr) minmax(145px,.75fr) 135px; gap: 10px; align-items: center; min-width: 0; min-height: 112px; padding: 14px 15px; border: 1px solid transparent; transition: border-color .16s ease, background .16s ease; }
 :host:nth-child(even) .participant { background: rgba(255,255,255,.018); }
 .participant:hover { border-color: var(--border); background: rgba(255,255,255,.035); }
+.participant--selectable { cursor: pointer; }
 .participant--highlighted { border-color: rgba(201,168,76,.5); background: rgba(201,168,76,.08); box-shadow: inset 3px 0 var(--accent); }
-.identity { display: grid; grid-template-columns: 54px minmax(0,1fr); grid-template-rows: auto auto; gap: 4px 10px; align-items: center; min-width: 0; }
+.identity { min-width: 0; }
+.profile-link { width: 100%; display: grid; grid-template-columns: 54px minmax(0,1fr); gap: 10px; align-items: center; padding: 0; border: 0; background: transparent; color: inherit; text-align: left; cursor: pointer; }
+.profile-link:disabled { cursor: default; }
+.profile-link:not(:disabled):hover .player-name strong { color: #e3c66f; }
 .champion { position: relative; width: 52px; height: 52px; }
-.champion { grid-column: 1; grid-row: 1 / 3; }
 .champion img { width: 52px; height: 52px; border: 1px solid var(--border-strong); border-radius: 9px; object-fit: cover; }
 .champion span { position: absolute; right: -2px; bottom: -3px; min-width: 17px; height: 17px; display: grid; place-items: center; padding: 0 3px; border-radius: 5px; background: #06141f; color: var(--text-secondary); font-size: 8px; }
 .player-name { min-width: 0; }
-.player-name { grid-column: 2; grid-row: 1; }
 .player-name strong, .player-name small { display: block; }
 .player-name strong { display: -webkit-box; overflow: hidden; color: var(--text-primary); font-size: 14px; font-weight: 650; line-height: 1.25; overflow-wrap: anywhere; -webkit-box-orient: vertical; -webkit-line-clamp: 2; }
 .player-name small { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .player-name small { margin-top: 5px; color: var(--text-muted); font-family: var(--font-display); font-size: 12px; }
 .setup, .setup > div { display: flex; gap: 3px; }
-.setup { grid-column: 2; grid-row: 2; flex-direction: row; gap: 7px; }
+.setup { flex-direction: row; gap: 7px; margin: 6px 0 0 64px; }
 .performance { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
 .performance .kda { color: var(--success); font-size: 16px; font-weight: 700; line-height: 1.2; white-space: nowrap; }
 .performance .kda em { color: var(--text-discreet); font-style: normal; font-weight: 400; }
@@ -30,18 +32,20 @@
 .participant--mirrored .main-items { grid-column: 2; grid-row: 1; }
 .participant--mirrored .trinket { grid-column: 1; grid-row: 1; justify-content: flex-start; padding-right: 7px; padding-left: 0; border-right: 1px solid var(--border-strong); border-left: 0; }
 .participant--mirrored .performance { grid-column: 2; grid-row: 1; text-align: right; }
-.participant--mirrored .identity { grid-column: 3; grid-row: 1; grid-template-columns: minmax(0,1fr) 54px; text-align: right; }
-.participant--mirrored .champion { grid-column: 2; grid-row: 1 / 3; }
+.participant--mirrored .identity { grid-column: 3; grid-row: 1; text-align: right; }
+.participant--mirrored .profile-link { grid-template-columns: minmax(0,1fr) 54px; text-align: right; }
+.participant--mirrored .champion { grid-column: 2; grid-row: 1; }
 .participant--mirrored .player-name { grid-column: 1; grid-row: 1; }
-.participant--mirrored .setup { grid-column: 1; grid-row: 2; justify-content: flex-end; }
+.participant--mirrored .setup { justify-content: flex-end; margin-right: 64px; margin-left: 0; }
 .participant--mirrored.participant--highlighted { box-shadow: inset -3px 0 var(--accent); }
 @media (max-width: 1050px) {
   .participant { grid-template-columns: minmax(170px,1.2fr) minmax(112px,.75fr) 126px; gap: 7px; padding-inline: 10px; }
   .participant--mirrored { grid-template-columns: 126px minmax(112px,.75fr) minmax(170px,1.2fr); }
-  .identity { grid-template-columns: 48px minmax(50px,1fr) auto; gap: 7px; }
+  .profile-link { grid-template-columns: 48px minmax(0,1fr); gap: 7px; }
   .champion, .champion img { width: 46px; height: 46px; }
-  .identity { grid-template-columns: 48px minmax(0,1fr); }
-  .participant--mirrored .identity { grid-template-columns: minmax(0,1fr) 48px; }
+  .setup { margin-left: 55px; }
+  .participant--mirrored .profile-link { grid-template-columns: minmax(0,1fr) 48px; }
+  .participant--mirrored .setup { margin-right: 55px; margin-left: 0; }
 }
 @media (max-width: 760px) {
   .participant, .participant--mirrored { grid-template-columns: minmax(165px,1fr) minmax(125px,.75fr) minmax(125px,.8fr); }
@@ -50,10 +54,11 @@
   .participant--mirrored .main-items { grid-column: 1; }
   .participant--mirrored .trinket { grid-column: 2; justify-content: flex-end; padding-right: 0; padding-left: 7px; border-right: 0; border-left: 1px solid var(--border-strong); }
   .participant--mirrored .performance { grid-column: 2; text-align: left; }
-  .participant--mirrored .identity { grid-column: 1; grid-template-columns: 48px minmax(0,1fr); text-align: left; }
-  .participant--mirrored .champion { grid-column: 1; grid-row: 1 / 3; }
+  .participant--mirrored .identity { grid-column: 1; text-align: left; }
+  .participant--mirrored .profile-link { grid-template-columns: 48px minmax(0,1fr); text-align: left; }
+  .participant--mirrored .champion { grid-column: 1; }
   .participant--mirrored .player-name { grid-column: 2; }
-  .participant--mirrored .setup { grid-column: 2; grid-row: 2; justify-content: flex-start; }
+  .participant--mirrored .setup { justify-content: flex-start; margin-right: 0; margin-left: 55px; }
   .participant--mirrored.participant--highlighted { box-shadow: inset 3px 0 var(--accent); }
 }
 @media (max-width: 480px) {

@@ -51,6 +51,7 @@
                       [version]="currentDetails.dataDragonVersion"
                       [catalog]="currentCatalog"
                       [highlighted]="bluePlayer.puuid === playerPuuid"
+                      (playerSelected)="selectParticipant($event)"
                     />
                   }
                   @if (participants(redTeam.teamId)[index]; as redPlayer) {
@@ -60,6 +61,7 @@
                       [catalog]="currentCatalog"
                       [highlighted]="redPlayer.puuid === playerPuuid"
                       [mirrored]="true"
+                      (playerSelected)="selectParticipant($event)"
                     />
                   }
                 </div>

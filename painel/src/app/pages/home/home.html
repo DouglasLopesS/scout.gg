@@ -16,7 +16,11 @@
     <h1>Seu histórico no Rift,<br /><span>revelado.</span></h1>
     <p>Consulte perfil, elo e desempenho recente usando seu Riot ID.</p>
     <div class="search-shell">
-      <app-player-search [loading]="state().status === 'loading'" (searchPlayer)="search($event)" />
+      <app-player-search
+        [loading]="state().status === 'loading'"
+        [value]="activeRiotId()"
+        (searchPlayer)="search($event)"
+      />
     </div>
   </section>
 
@@ -59,6 +63,7 @@
                   [matchId]="match.id"
                   [playerPuuid]="player.account.puuid"
                   (closed)="closeMatch()"
+                  (playerSelected)="viewPlayer($event)"
                 />
               }
             }

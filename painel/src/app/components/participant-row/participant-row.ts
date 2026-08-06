@@ -1,4 +1,4 @@
-import { Component, Input, inject } from '@angular/core';
+import { Component, EventEmitter, Input, Output, inject } from '@angular/core';
 import type { GameAssetCatalog } from '../../models/game-assets.model';
 import type { MatchParticipantDetails } from '../../models/match-details.model';
 import { DataDragonAssetsService } from '../../services/data-dragon-assets.service';
@@ -21,6 +21,7 @@ export class ParticipantRow {
   @Input({ required: true }) catalog!: GameAssetCatalog;
   @Input() highlighted = false;
   @Input() mirrored = false;
+  @Output() readonly playerSelected = new EventEmitter<{ gameName: string; tagLine: string }>();
 
   readonly formatNumber = formatNumber;
 
@@ -47,5 +48,18 @@ export class ParticipantRow {
 
   get trinketId(): number {
     return this.participant.item6;
+  }
+
+  openPlayer(): void {
+    if (!this.participant.riotIdTagline) return;
+    this.playerSelected.emit({
+      gameName: this.participant.riotIdGameName,
+      tagLine: this.participant.riotIdTagline
+    });
+  }
+
+  selectFromRow(event: MouseEvent): void {
+    if ((event.target as Element).closest('button')) return;
+    this.openPlayer();
   }
 }

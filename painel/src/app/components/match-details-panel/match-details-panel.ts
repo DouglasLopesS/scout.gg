@@ -52,6 +52,7 @@ export class MatchDetailsPanel implements AfterViewInit, OnChanges, OnDestroy {
   @Input({ required: true }) matchId = '';
   @Input({ required: true }) playerPuuid = '';
   @Output() readonly closed = new EventEmitter<void>();
+  @Output() readonly playerSelected = new EventEmitter<{ gameName: string; tagLine: string }>();
 
   readonly state = signal<PanelState>('loading');
   readonly details = signal<MatchDetails | null>(null);
@@ -89,6 +90,10 @@ export class MatchDetailsPanel implements AfterViewInit, OnChanges, OnDestroy {
 
   searchedPlayer(): MatchParticipantDetails | undefined {
     return this.details()?.participants.find(({ puuid }) => puuid === this.playerPuuid);
+  }
+
+  selectParticipant(riotId: { gameName: string; tagLine: string }): void {
+    this.playerSelected.emit(riotId);
   }
 
   private load(): void {

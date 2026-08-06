@@ -37,8 +37,10 @@ export class Home {
   readonly selectedMatchId = signal<string | null>(null);
   readonly loadingMore = signal(false);
   readonly loadMoreError = signal('');
+  readonly activeRiotId = signal('');
 
   search(riotId: { gameName: string; tagLine: string }): void {
+    this.activeRiotId.set(`${riotId.gameName}#${riotId.tagLine}`);
     this.selectedMatchId.set(null);
     this.loadingMore.set(false);
     this.loadMoreError.set('');
@@ -67,6 +69,11 @@ export class Home {
 
   closeMatch(): void {
     this.selectedMatchId.set(null);
+  }
+
+  viewPlayer(riotId: { gameName: string; tagLine: string }): void {
+    this.search(riotId);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
   loadMore(): void {
