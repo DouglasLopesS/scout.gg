@@ -1,15 +1,25 @@
 <form class="search" (ngSubmit)="submit()" novalidate>
-  <div class="field" [class.field--invalid]="riotId.invalid && riotId.touched">
-    <svg lucideSearch size="21" strokeWidth="1.8" aria-hidden="true"></svg>
-    <label class="sr-only" for="riot-id">Riot ID</label>
-    <input
-      id="riot-id"
-      [formControl]="riotId"
-      placeholder="Ex.: Faker#KR1"
-      autocomplete="off"
-      spellcheck="false"
-      (keydown.enter)="$event.preventDefault(); submit()"
-    />
+  <div class="search__fields">
+    <div class="field" [class.field--invalid]="riotId.invalid && riotId.touched">
+      <svg lucideSearch size="21" strokeWidth="1.8" aria-hidden="true"></svg>
+      <label class="sr-only" for="riot-id">Riot ID</label>
+      <input
+        id="riot-id"
+        [formControl]="riotId"
+        placeholder="Ex.: Faker#KR1"
+        autocomplete="off"
+        spellcheck="false"
+        (keydown.enter)="$event.preventDefault(); submit()"
+      />
+    </div>
+    <label class="server-field">
+      <span class="sr-only">Servidor</span>
+      <select [value]="platform" [disabled]="loading" (change)="selectPlatform($event)" aria-label="Servidor">
+        @for (server of servers; track server.platform) {
+          <option [value]="server.platform">{{ server.label }}</option>
+        }
+      </select>
+    </label>
   </div>
   <button type="button" [disabled]="loading" (click)="submit()">
     <svg lucideSearch size="18" strokeWidth="2" aria-hidden="true"></svg>

@@ -24,6 +24,7 @@ import type {
 import { DataDragonAssetsService } from '../../services/data-dragon-assets.service';
 import { MatchDetailsService } from '../../services/match-details.service';
 import { formatDuration } from '../../shared/format.utils';
+import type { RiotPlatform, RiotRegion } from '../../shared/riot-routing';
 import { ParticipantRow } from '../participant-row/participant-row';
 import { StatusBadge } from '../status-badge/status-badge';
 import { TeamSummary } from '../team-summary/team-summary';
@@ -51,6 +52,8 @@ export class MatchDetailsPanel implements AfterViewInit, OnChanges, OnDestroy {
 
   @Input({ required: true }) matchId = '';
   @Input({ required: true }) playerPuuid = '';
+  @Input({ required: true }) platform!: RiotPlatform;
+  @Input({ required: true }) region!: RiotRegion;
   @Output() readonly closed = new EventEmitter<void>();
   @Output() readonly playerSelected = new EventEmitter<{ gameName: string; tagLine: string }>();
 
@@ -61,7 +64,7 @@ export class MatchDetailsPanel implements AfterViewInit, OnChanges, OnDestroy {
   readonly formatDuration = formatDuration;
 
   ngOnChanges(changes: SimpleChanges): void {
-    if (changes['matchId'] && this.matchId) this.load();
+    if ((changes['matchId'] || changes['platform'] || changes['region']) && this.matchId && this.platform && this.region) this.load();
   }
 
   ngAfterViewInit(): void {
@@ -103,7 +106,7 @@ export class MatchDetailsPanel implements AfterViewInit, OnChanges, OnDestroy {
     this.catalog.set(null);
     this.errorMessage.set('');
 
-    this.request = this.detailsService.findById(this.matchId).pipe(
+    this.request = this.detailsService.findById(this.matchId, this.platform, this.region).pipe(
       switchMap((details) => this.assetsService.getCatalog(details.dataDragonVersion)
         .pipe(map((catalog) => [details, catalog] as const)))
     ).subscribe({

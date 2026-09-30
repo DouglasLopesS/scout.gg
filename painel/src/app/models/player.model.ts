@@ -1,3 +1,5 @@
+import type { RiotServer } from '../shared/riot-routing';
+
 export interface PlayerRank {
   queueType: string;
   tier: string;
@@ -36,6 +38,7 @@ export interface PlayerMatch {
 }
 
 export interface Player {
+  server: RiotServer;
   account: { puuid: string; gameName: string; tagLine: string };
   profile: { summonerId: string; level: number; profileIconId: number; profileIconUrl: string };
   rank: PlayerRank | null;

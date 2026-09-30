@@ -8,7 +8,8 @@
     "build": "tsc -p tsconfig.json",
     "start": "node dist/server.js",
     "typecheck": "tsc --noEmit",
-    "test": "node --experimental-strip-types test/cached-request-queue.test.ts"
+    "pretest": "npm run build",
+    "test": "node --experimental-strip-types test/index.ts"
   },
   "engines": {
     "node": "^22.22.3 || ^24.15.0 || >=26.0.0"

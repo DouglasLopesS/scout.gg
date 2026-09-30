@@ -4,7 +4,7 @@
       <span class="brand-icon"><svg lucideRadar size="21" strokeWidth="1.7" aria-hidden="true"></svg></span>
       <span>Scout<span>.gg</span></span>
     </a>
-    <span class="region">BR1 · AMERICAS</span>
+    <span class="region">{{ displayedServer().platform.toUpperCase() }} · {{ displayedServer().region.toUpperCase() }}</span>
   </div>
 </header>
 
@@ -19,7 +19,9 @@
       <app-player-search
         [loading]="state().status === 'loading'"
         [value]="activeRiotId()"
+        [platform]="selectedPlatform()"
         (searchPlayer)="search($event)"
+        (platformSelected)="selectPlatform($event)"
       />
     </div>
   </section>
@@ -83,6 +85,8 @@
                 <app-match-details-panel
                   [matchId]="match.id"
                   [playerPuuid]="player.account.puuid"
+                  [platform]="player.server.platform"
+                  [region]="player.server.region"
                   (closed)="closeMatch()"
                   (playerSelected)="viewPlayer($event)"
                 />

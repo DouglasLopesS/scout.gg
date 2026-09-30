@@ -1,13 +1,19 @@
 import type { Request, Response } from 'express';
 import { MatchDetailsService } from '../services/match-details.service.js';
+import type { RiotPlatform } from '../config/riot-routing.js';
 import { AppError } from '../utils/app-error.js';
+import { validatePlatform } from '../utils/validate-platform.js';
 
 export class MatchDetailsController {
-  constructor(private readonly matchDetailsService: MatchDetailsService) {}
+  constructor(
+    private readonly matchDetailsService: MatchDetailsService,
+    private readonly defaultPlatform: RiotPlatform
+  ) {}
 
   getMatch = async (request: Request, response: Response): Promise<void> => {
     const matchId = this.validateMatchId(request.params['matchId']);
-    const match = await this.matchDetailsService.findById(matchId);
+    const platform = validatePlatform(request.query['platform'], this.defaultPlatform);
+    const match = await this.matchDetailsService.findById(matchId, platform);
     response.status(200).json(match);
   };
 

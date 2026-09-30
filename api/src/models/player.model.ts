@@ -1,3 +1,5 @@
+import type { RiotRouting } from '../config/riot-routing.js';
+
 export interface AssetUrls {
   championIcon: string;
   championSplash: string;
@@ -26,6 +28,7 @@ export interface PlayerMatch {
 }
 
 export interface PlayerResponse {
+  server: RiotRouting;
   account: { puuid: string; gameName: string; tagLine: string };
   profile: { summonerId: string; level: number; profileIconId: number; profileIconUrl: string };
   rank: {

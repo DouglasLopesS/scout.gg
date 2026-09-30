@@ -1,5 +1,6 @@
 import { DataDragonClient, type DataDragonCatalog } from '../clients/data-dragon.client.js';
-import { RiotClient } from '../clients/riot.client.js';
+import { RiotClientRegistry } from '../clients/riot-client-registry.js';
+import { routingForPlatform, type RiotPlatform } from '../config/riot-routing.js';
 import type { PlayerMatch, PlayerMatchesPage, PlayerResponse } from '../models/player.model.js';
 import type { RiotLeagueEntryDto, RiotMatchDto, RiotParticipantDto } from '../types/riot.types.js';
 import { AppError } from '../utils/app-error.js';
@@ -7,25 +8,27 @@ import { getQueueName } from '../utils/queue-names.js';
 
 export class PlayerService {
   constructor(
-    private readonly riotClient: RiotClient,
+    private readonly riotClients: RiotClientRegistry,
     private readonly dataDragonClient: DataDragonClient
   ) {}
 
-  async findByRiotId(gameName: string, tagLine: string): Promise<PlayerResponse> {
-    const account = await this.riotClient.getAccountByRiotId(gameName, tagLine);
+  async findByRiotId(gameName: string, tagLine: string, platform: RiotPlatform): Promise<PlayerResponse> {
+    const riotClient = this.riotClients.get(platform);
+    const account = await riotClient.getAccountByRiotId(gameName, tagLine);
     const [summoner, matchIds, dataDragonVersion] = await Promise.all([
-      this.riotClient.getSummonerByPuuid(account.puuid),
-      this.riotClient.getMatchIds(account.puuid, 0, 11),
+      riotClient.getSummonerByPuuid(account.puuid),
+      riotClient.getMatchIds(account.puuid, 0, 11),
       this.dataDragonClient.getLatestVersion()
     ]);
     const visibleMatchIds = matchIds.slice(0, 10);
     const [entries, matchDtos, catalog] = await Promise.all([
-      this.riotClient.getLeagueEntries(account.puuid),
-      Promise.all(visibleMatchIds.map((id) => this.riotClient.getMatch(id))),
+      riotClient.getLeagueEntries(account.puuid),
+      Promise.all(visibleMatchIds.map((id) => this.riotClients.getMatch(platform, id))),
       this.dataDragonClient.getCatalog(dataDragonVersion)
     ]);
 
     return {
+      server: routingForPlatform(platform),
       account,
       profile: {
         summonerId: summoner.id,
@@ -40,14 +43,15 @@ export class PlayerService {
     };
   }
 
-  async findMatches(puuid: string, start: number, count: number): Promise<PlayerMatchesPage> {
+  async findMatches(puuid: string, start: number, count: number, platform: RiotPlatform): Promise<PlayerMatchesPage> {
+    const riotClient = this.riotClients.get(platform);
     const [matchIds, dataDragonVersion] = await Promise.all([
-      this.riotClient.getMatchIds(puuid, start, count + 1),
+      riotClient.getMatchIds(puuid, start, count + 1),
       this.dataDragonClient.getLatestVersion()
     ]);
     const visibleMatchIds = matchIds.slice(0, count);
     const [matchDtos, catalog] = await Promise.all([
-      Promise.all(visibleMatchIds.map((id) => this.riotClient.getMatch(id))),
+      Promise.all(visibleMatchIds.map((id) => this.riotClients.getMatch(platform, id))),
       this.dataDragonClient.getCatalog(dataDragonVersion)
     ]);
 

@@ -1,5 +1,6 @@
 import { DataDragonClient } from '../clients/data-dragon.client.js';
-import { RiotClient } from '../clients/riot.client.js';
+import { RiotClientRegistry } from '../clients/riot-client-registry.js';
+import type { RiotPlatform } from '../config/riot-routing.js';
 import type {
   MatchDetailsResponse,
   MatchParticipantDetails,
@@ -11,13 +12,13 @@ import { getQueueName } from '../utils/queue-names.js';
 
 export class MatchDetailsService {
   constructor(
-    private readonly riotClient: RiotClient,
+    private readonly riotClients: RiotClientRegistry,
     private readonly dataDragonClient: DataDragonClient
   ) {}
 
-  async findById(matchId: string): Promise<MatchDetailsResponse> {
+  async findById(matchId: string, platform: RiotPlatform): Promise<MatchDetailsResponse> {
     const [match, dataDragonVersion] = await Promise.all([
-      this.riotClient.getMatch(matchId),
+      this.riotClients.getMatch(platform, matchId),
       this.dataDragonClient.getLatestVersion()
     ]);
 

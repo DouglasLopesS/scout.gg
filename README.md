@@ -11,6 +11,8 @@ O **scout.gg** reúne dados de conta, perfil ranqueado e as dez partidas mais re
 
 As partidas são guardadas em memória na API por até uma hora (máximo de 300 entradas). Buscas simultâneas pelo mesmo ID compartilham uma única chamada, e no máximo três buscas de partidas são feitas à Riot ao mesmo tempo. O cache é limpo ao reiniciar a API.
 
+O painel permite escolher a plataforma antes da busca. A API deriva a região correspondente para Account-V1 e Match-V5 e mantém o cache de partidas separado por plataforma/região.
+
 ## Stack
 
 | Camada | Tecnologias |
@@ -64,16 +66,20 @@ Configure `api/.env`:
 RIOT_API_KEY=RGAPI-sua-chave-aqui
 ```
 
+`RIOT_PLATFORM` define a plataforma padrão da API (`br1` se omitida). A região é derivada automaticamente; `RIOT_REGION` não é necessária.
+
 ## Execução local
 
 Inicie a API:
 
+```bash
 cd api
 npm run dev
 ```
 
 Inicie o painel:
 
+```bash
 cd painel
 npm start
 ```
@@ -85,6 +91,8 @@ Serviços disponíveis:
 | Painel | `http://localhost:4200` |
 | API | `http://localhost:3000` |
 | Health check | `http://localhost:3000/health` |
+
+As consultas aceitam `?platform=br1` (ou outra plataforma exibida no seletor). Isso se aplica à busca por Riot ID, à paginação e aos detalhes de partida. Sem o parâmetro, a API usa `RIOT_PLATFORM`.
 
 ### Health check
 
@@ -153,7 +161,6 @@ npm run build
 
 ## Próximos passos
 
-- Adicionar suporte a outras plataformas e regiões.
 - Persistir pesquisas e preferências do usuário.
 
 ## Documentação oficial

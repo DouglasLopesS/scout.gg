@@ -1,14 +1,20 @@
 import type { Request, Response } from 'express';
 import { PlayerService } from '../services/player.service.js';
+import type { RiotPlatform } from '../config/riot-routing.js';
 import { AppError } from '../utils/app-error.js';
+import { validatePlatform } from '../utils/validate-platform.js';
 
 export class PlayerController {
-  constructor(private readonly playerService: PlayerService) {}
+  constructor(
+    private readonly playerService: PlayerService,
+    private readonly defaultPlatform: RiotPlatform
+  ) {}
 
   getPlayer = async (request: Request, response: Response): Promise<void> => {
     const gameName = this.validatePart(request.params['gameName'], 'nome', 3, 16);
     const tagLine = this.validatePart(request.params['tagLine'], 'tag', 3, 5);
-    const player = await this.playerService.findByRiotId(gameName, tagLine);
+    const platform = validatePlatform(request.query['platform'], this.defaultPlatform);
+    const player = await this.playerService.findByRiotId(gameName, tagLine, platform);
     response.status(200).json(player);
   };
 
@@ -16,7 +22,8 @@ export class PlayerController {
     const puuid = this.validatePuuid(request.params['puuid']);
     const start = this.validateInteger(request.query['start'], 'start', 0, 990, 0);
     const count = this.validateInteger(request.query['count'], 'count', 1, 20, 10);
-    const page = await this.playerService.findMatches(puuid, start, count);
+    const platform = validatePlatform(request.query['platform'], this.defaultPlatform);
+    const page = await this.playerService.findMatches(puuid, start, count, platform);
     response.status(200).json(page);
   };
 

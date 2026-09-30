@@ -2,7 +2,7 @@ import cors from 'cors';
 import express, { type Express } from 'express';
 import helmet from 'helmet';
 import { DataDragonClient } from './clients/data-dragon.client.js';
-import { RiotClient } from './clients/riot.client.js';
+import { RiotClientRegistry } from './clients/riot-client-registry.js';
 import type { AppConfig } from './config/env.js';
 import { PlayerController } from './controllers/player.controller.js';
 import { MatchDetailsController } from './controllers/match-details.controller.js';
@@ -14,12 +14,12 @@ import { PlayerService } from './services/player.service.js';
 
 export const createApp = (config: AppConfig): Express => {
   const app = express();
-  const riotClient = new RiotClient(config.riot);
+  const riotClients = new RiotClientRegistry(config.riot.apiKey);
   const dataDragonClient = new DataDragonClient();
-  const playerService = new PlayerService(riotClient, dataDragonClient);
-  const matchDetailsService = new MatchDetailsService(riotClient, dataDragonClient);
-  const playerController = new PlayerController(playerService);
-  const matchDetailsController = new MatchDetailsController(matchDetailsService);
+  const playerService = new PlayerService(riotClients, dataDragonClient);
+  const matchDetailsService = new MatchDetailsService(riotClients, dataDragonClient);
+  const playerController = new PlayerController(playerService, config.riot.platform);
+  const matchDetailsController = new MatchDetailsController(matchDetailsService, config.riot.platform);
 
   app.disable('x-powered-by');
   app.use(helmet({ crossOriginResourcePolicy: false }));

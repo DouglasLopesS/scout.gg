@@ -1,5 +1,5 @@
 import axios, { AxiosError, type AxiosInstance } from 'axios';
-import type { AppConfig } from '../config/env.js';
+import type { RiotRouting } from '../config/riot-routing.js';
 import type {
   RiotAccountDto,
   RiotLeagueEntryDto,
@@ -7,11 +7,6 @@ import type {
   RiotSummonerDto
 } from '../types/riot.types.js';
 import { AppError } from '../utils/app-error.js';
-import { CachedRequestQueue } from '../utils/cached-request-queue.js';
-
-const MATCH_REQUEST_CONCURRENCY = 3;
-const MATCH_CACHE_MAX_ENTRIES = 300;
-const MATCH_CACHE_TTL_MS = 60 * 60 * 1000;
 
 const FRIENDLY_ERRORS: Readonly<Record<number, { message: string; code: string }>> = {
   401: { message: 'A chave da Riot é inválida ou expirou.', code: 'RIOT_UNAUTHORIZED' },
@@ -21,15 +16,20 @@ const FRIENDLY_ERRORS: Readonly<Record<number, { message: string; code: string }
 };
 
 export class RiotClient {
+  private readonly accountClient: AxiosInstance;
   private readonly platformClient: AxiosInstance;
   private readonly regionalClient: AxiosInstance;
-  private readonly matchRequests: CachedRequestQueue<string, RiotMatchDto>;
 
-  constructor(config: AppConfig['riot']) {
+  constructor(config: RiotRouting & { apiKey: string }) {
     const commonConfig = {
       timeout: 10_000,
       headers: { 'X-Riot-Token': config.apiKey }
     };
+    this.accountClient = axios.create({
+      ...commonConfig,
+      // Account-V1 não usa o roteamento SEA; a conta pode ser consultada em ASIA.
+      baseURL: `https://${config.region === 'sea' ? 'asia' : config.region}.api.riotgames.com`
+    });
     this.platformClient = axios.create({
       ...commonConfig,
       baseURL: `https://${config.platform}.api.riotgames.com`
@@ -38,18 +38,10 @@ export class RiotClient {
       ...commonConfig,
       baseURL: `https://${config.region}.api.riotgames.com`
     });
-    this.matchRequests = new CachedRequestQueue(
-      (matchId) => this.request(() => this.regionalClient.get<RiotMatchDto>(
-        `/lol/match/v5/matches/${encodeURIComponent(matchId)}`
-      ), { message: 'Partida não encontrada.', code: 'MATCH_NOT_FOUND' }),
-      MATCH_REQUEST_CONCURRENCY,
-      MATCH_CACHE_MAX_ENTRIES,
-      MATCH_CACHE_TTL_MS
-    );
   }
 
   async getAccountByRiotId(gameName: string, tagLine: string): Promise<RiotAccountDto> {
-    return this.request(() => this.regionalClient.get<RiotAccountDto>(
+    return this.request(() => this.accountClient.get<RiotAccountDto>(
       `/riot/account/v1/accounts/by-riot-id/${encodeURIComponent(gameName)}/${encodeURIComponent(tagLine)}`
     ));
   }
@@ -74,7 +66,9 @@ export class RiotClient {
   }
 
   async getMatch(matchId: string): Promise<RiotMatchDto> {
-    return this.matchRequests.get(matchId);
+    return this.request(() => this.regionalClient.get<RiotMatchDto>(
+      `/lol/match/v5/matches/${encodeURIComponent(matchId)}`
+    ), { message: 'Partida não encontrada.', code: 'MATCH_NOT_FOUND' });
   }
 
   private async request<T>(

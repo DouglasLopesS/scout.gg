@@ -13,6 +13,7 @@ import type { ApiErrorResponse } from '../../models/player.model';
 import type { SearchState } from '../../models/search-state.model';
 import { PlayerService } from '../../services/player.service';
 import { summarizeMatches } from '../../shared/match-summary';
+import { regionForPlatform, type PlayerSearchRequest, type RiotPlatform } from '../../shared/riot-routing';
 
 @Component({
   selector: 'app-home',
@@ -36,7 +37,7 @@ import { summarizeMatches } from '../../shared/match-summary';
 })
 export class Home {
   private readonly playerService = inject(PlayerService);
-  private lastSearch: { gameName: string; tagLine: string } | null = null;
+  private lastSearch: PlayerSearchRequest | null = null;
   private searchVersion = 0;
   private nextMatchStart = 0;
 
@@ -45,6 +46,12 @@ export class Home {
   readonly loadingMore = signal(false);
   readonly loadMoreError = signal('');
   readonly activeRiotId = signal('');
+  readonly selectedPlatform = signal<RiotPlatform>('br1');
+  readonly selectedRegion = computed(() => regionForPlatform(this.selectedPlatform()));
+  readonly displayedServer = computed(() => this.state().player?.server ?? {
+    platform: this.selectedPlatform(),
+    region: this.selectedRegion()
+  });
   readonly selectedQueueId = signal<number | null>(null);
   readonly selectedChampionId = signal<number | null>(null);
   readonly selectedResult = signal<'all' | 'win' | 'loss'>('all');
@@ -73,8 +80,9 @@ export class Home {
   });
   readonly matchSummary = computed(() => summarizeMatches(this.visibleMatches()));
 
-  search(riotId: { gameName: string; tagLine: string }): void {
+  search(riotId: PlayerSearchRequest): void {
     const searchVersion = ++this.searchVersion;
+    this.selectedPlatform.set(riotId.platform);
     this.activeRiotId.set(`${riotId.gameName}#${riotId.tagLine}`);
     this.selectedMatchId.set(null);
     this.loadingMore.set(false);
@@ -85,7 +93,7 @@ export class Home {
     this.nextMatchStart = 0;
     this.lastSearch = riotId;
     this.state.set({ status: 'loading', player: null, errorMessage: '' });
-    this.playerService.findByRiotId(riotId.gameName, riotId.tagLine)
+    this.playerService.findByRiotId(riotId.gameName, riotId.tagLine, riotId.platform)
       .subscribe({
         next: (player) => {
           if (searchVersion !== this.searchVersion) return;
@@ -128,8 +136,12 @@ export class Home {
     this.selectedMatchId.set(null);
   }
 
+  selectPlatform(platform: RiotPlatform): void {
+    this.selectedPlatform.set(platform);
+  }
+
   viewPlayer(riotId: { gameName: string; tagLine: string }): void {
-    this.search(riotId);
+    this.search({ ...riotId, platform: this.state().player?.server.platform ?? this.selectedPlatform() });
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
@@ -141,7 +153,7 @@ export class Home {
     const start = this.nextMatchStart;
     this.loadingMore.set(true);
     this.loadMoreError.set('');
-    this.playerService.findMatches(player.account.puuid, start).subscribe({
+    this.playerService.findMatches(player.account.puuid, start, player.server.platform).subscribe({
       next: (page) => {
         if (searchVersion !== this.searchVersion) return;
         this.nextMatchStart = start + page.matches.length;
