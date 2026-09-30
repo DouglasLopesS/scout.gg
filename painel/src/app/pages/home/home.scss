@@ -32,6 +32,7 @@ main { width: min(1240px, calc(100% - 40px)); flex: 1; margin: 0 auto; }
 .history-heading h2 { margin: 6px 0 0; color: var(--text-primary); font-family: var(--font-display); font-size: 28px; font-weight: 500; letter-spacing: normal; }
 .match-count { padding: 6px 10px; border: 1px solid var(--border); border-radius: 999px; background: rgba(255,255,255,.025); color: var(--text-discreet); font-size: 10px; }
 .matches { display: flex; flex-direction: column; gap: 9px; }
+.matches-empty { margin: 0; padding: 22px; border: 1px dashed var(--border-strong); border-radius: 12px; color: var(--text-discreet); font-size: 13px; text-align: center; }
 footer { min-height: 82px; display: flex; align-items: center; justify-content: space-between; gap: 20px; padding: 18px max(20px, calc((100vw - 1240px) / 2)); border-top: 1px solid var(--border); background: rgba(3, 13, 21, .55); }
 footer > div { display: flex; align-items: center; gap: 12px; }
 footer span { color: var(--text-secondary); font-family: var(--font-display); font-size: 13px; font-weight: 600; }

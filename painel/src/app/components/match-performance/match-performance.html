@@ -5,8 +5,10 @@
       <h2 id="performance-title">Resumo de desempenho</h2>
       <p>{{ summary.games }} de {{ totalMatches }} partidas na amostra</p>
     </div>
-    <label class="queue-filter">
-      <span>Filtrar por fila</span>
+  </div>
+  <div class="performance-filters" role="group" aria-label="Filtros do histórico de partidas">
+    <label class="performance-filter">
+      <span>Fila</span>
       <select [value]="selectedQueueId ?? 'all'" (change)="selectQueue($event)">
         <option value="all">Todas as filas</option>
         @for (queue of queues; track queue.id) {
@@ -14,7 +16,25 @@
         }
       </select>
     </label>
+    <label class="performance-filter">
+      <span>Campeão</span>
+      <select [value]="selectedChampionId ?? 'all'" (change)="selectChampion($event)">
+        <option value="all">Todos os campeões</option>
+        @for (champion of champions; track champion.id) {
+          <option [value]="champion.id">{{ champion.name }}</option>
+        }
+      </select>
+    </label>
+    <label class="performance-filter">
+      <span>Resultado</span>
+      <select [value]="selectedResult" (change)="selectResult($event)">
+        <option value="all">Todos os resultados</option>
+        <option value="win">Vitórias</option>
+        <option value="loss">Derrotas</option>
+      </select>
+    </label>
   </div>
+  <p class="filters-note">Os filtros consideram as partidas já carregadas.</p>
   <div class="performance-metrics">
     <div class="performance-metric"><span>Vitórias</span><strong>{{ summary.wins }} <small>/ {{ summary.games }}</small></strong><small>{{ summary.winRate }}% de aproveitamento</small></div>
     <div class="performance-metric"><span>KDA médio</span><strong>{{ summary.averageKda.toFixed(2) }}</strong><small>(abates + assistências) / mortes</small></div>
@@ -34,7 +54,7 @@
         }
       </div>
     } @else {
-      <p>Nenhuma partida carregada nesta fila.</p>
+      <p>Nenhuma partida carregada corresponde aos filtros.</p>
     }
   </div>
 </section>

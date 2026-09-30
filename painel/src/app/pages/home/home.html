@@ -48,8 +48,13 @@
             [summary]="matchSummary()"
             [totalMatches]="player.matches.length"
             [queues]="queueOptions()"
+            [champions]="championOptions()"
             [selectedQueueId]="selectedQueueId()"
+            [selectedChampionId]="selectedChampionId()"
+            [selectedResult]="selectedResult()"
             (queueSelected)="selectQueue($event)"
+            (championSelected)="selectChampion($event)"
+            (resultSelected)="selectResult($event)"
           />
           <div class="history-heading">
             <div>
@@ -59,6 +64,12 @@
             <span class="match-count">{{ visibleMatches().length }} partidas exibidas</span>
           </div>
           <div class="matches">
+            @if (visibleMatches().length === 0) {
+              <p class="matches-empty">
+                Nenhuma das partidas carregadas corresponde aos filtros.
+                @if (player.hasMoreMatches) { Carregue mais partidas ou altere os filtros. }
+              </p>
+            }
             @for (match of visibleMatches(); track match.id) {
               <app-match-card
                 [match]="match"

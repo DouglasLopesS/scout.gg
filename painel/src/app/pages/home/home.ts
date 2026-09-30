@@ -35,6 +35,8 @@ import { summarizeMatches } from '../../shared/match-summary';
 export class Home {
   private readonly playerService = inject(PlayerService);
   private lastSearch: { gameName: string; tagLine: string } | null = null;
+  private searchVersion = 0;
+  private nextMatchStart = 0;
 
   readonly state = signal<SearchState>({ status: 'idle', player: null, errorMessage: '' });
   readonly selectedMatchId = signal<string | null>(null);
@@ -42,34 +44,55 @@ export class Home {
   readonly loadMoreError = signal('');
   readonly activeRiotId = signal('');
   readonly selectedQueueId = signal<number | null>(null);
+  readonly selectedChampionId = signal<number | null>(null);
+  readonly selectedResult = signal<'all' | 'win' | 'loss'>('all');
   readonly queueOptions = computed(() => {
     const matches = this.state().player?.matches ?? [];
     const queues = new Map<number, string>();
     for (const match of matches) queues.set(match.queueId, match.queueName);
     return [...queues].map(([id, name]) => ({ id, name })).sort((a, b) => a.name.localeCompare(b.name, 'pt-BR'));
   });
+  readonly championOptions = computed(() => {
+    const matches = this.state().player?.matches ?? [];
+    const champions = new Map<number, string>();
+    for (const match of matches) champions.set(match.champion.id, match.champion.name);
+    return [...champions].map(([id, name]) => ({ id, name })).sort((a, b) => a.name.localeCompare(b.name, 'pt-BR'));
+  });
   readonly visibleMatches = computed(() => {
     const matches = this.state().player?.matches ?? [];
     const queueId = this.selectedQueueId();
-    return queueId === null ? matches : matches.filter((match) => match.queueId === queueId);
+    const championId = this.selectedChampionId();
+    const result = this.selectedResult();
+    return matches.filter((match) =>
+      (queueId === null || match.queueId === queueId)
+      && (championId === null || match.champion.id === championId)
+      && (result === 'all' || match.win === (result === 'win'))
+    );
   });
   readonly matchSummary = computed(() => summarizeMatches(this.visibleMatches()));
 
   search(riotId: { gameName: string; tagLine: string }): void {
+    const searchVersion = ++this.searchVersion;
     this.activeRiotId.set(`${riotId.gameName}#${riotId.tagLine}`);
     this.selectedMatchId.set(null);
     this.loadingMore.set(false);
     this.loadMoreError.set('');
     this.selectedQueueId.set(null);
+    this.selectedChampionId.set(null);
+    this.selectedResult.set('all');
+    this.nextMatchStart = 0;
     this.lastSearch = riotId;
     this.state.set({ status: 'loading', player: null, errorMessage: '' });
     this.playerService.findByRiotId(riotId.gameName, riotId.tagLine)
       .subscribe({
         next: (player) => {
+          if (searchVersion !== this.searchVersion) return;
+          this.nextMatchStart = player.matches.length;
           const status = player.matches.length ? 'success' : 'empty';
           this.state.set({ status, player, errorMessage: '' });
         },
         error: (error: unknown) => {
+          if (searchVersion !== this.searchVersion) return;
           const errorMessage = this.getErrorMessage(error);
           this.state.set({ status: 'error', player: null, errorMessage });
         }
@@ -93,6 +116,16 @@ export class Home {
     this.selectedMatchId.set(null);
   }
 
+  selectChampion(championId: number | null): void {
+    this.selectedChampionId.set(championId);
+    this.selectedMatchId.set(null);
+  }
+
+  selectResult(result: 'all' | 'win' | 'loss'): void {
+    this.selectedResult.set(result);
+    this.selectedMatchId.set(null);
+  }
+
   viewPlayer(riotId: { gameName: string; tagLine: string }): void {
     this.search(riotId);
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -102,10 +135,14 @@ export class Home {
     const player = this.state().player;
     if (!player || !player.hasMoreMatches || this.loadingMore()) return;
 
+    const searchVersion = this.searchVersion;
+    const start = this.nextMatchStart;
     this.loadingMore.set(true);
     this.loadMoreError.set('');
-    this.playerService.findMatches(player.account.puuid, player.matches.length).subscribe({
+    this.playerService.findMatches(player.account.puuid, start).subscribe({
       next: (page) => {
+        if (searchVersion !== this.searchVersion) return;
+        this.nextMatchStart = start + page.matches.length;
         this.state.update((current) => {
           if (!current.player) return current;
           const loadedIds = new Set(current.player.matches.map(({ id }) => id));
@@ -122,6 +159,7 @@ export class Home {
         this.loadingMore.set(false);
       },
       error: (error: unknown) => {
+        if (searchVersion !== this.searchVersion) return;
         this.loadMoreError.set(this.getErrorMessage(error));
         this.loadingMore.set(false);
       }
