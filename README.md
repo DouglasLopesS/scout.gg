@@ -15,6 +15,8 @@ Ao receber `429` da Riot, a API pausa novas consultas pelo tempo indicado em `Re
 
 O painel permite escolher a plataforma antes da busca. A API deriva a região correspondente para Account-V1 e Match-V5 e mantém o cache de partidas separado por plataforma/região.
 
+O resumo, os gráficos e os filtros usam somente as partidas já carregadas. O painel mostra quantas partidas aparecem após os filtros e permite carregar até dez partidas adicionais por vez para ampliar a análise.
+
 ## Stack
 
 | Camada | Tecnologias |

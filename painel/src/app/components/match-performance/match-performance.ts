@@ -10,6 +10,9 @@ import { formatNumber } from '../../shared/format.utils';
 export class MatchPerformance {
   @Input({ required: true }) summary!: MatchSummary;
   @Input({ required: true }) totalMatches!: number;
+  @Input() hasMoreMatches = false;
+  @Input() loadingMore = false;
+  @Input() loadMoreError = '';
   @Input({ required: true }) queues!: ReadonlyArray<{ id: number; name: string }>;
   @Input({ required: true }) champions!: ReadonlyArray<{ id: number; name: string }>;
   @Input() selectedQueueId: number | null = null;
@@ -18,6 +21,7 @@ export class MatchPerformance {
   @Output() readonly queueSelected = new EventEmitter<number | null>();
   @Output() readonly championSelected = new EventEmitter<number | null>();
   @Output() readonly resultSelected = new EventEmitter<'all' | 'win' | 'loss'>();
+  @Output() readonly loadMore = new EventEmitter<void>();
   readonly formatNumber = formatNumber;
 
   selectQueue(event: Event): void {

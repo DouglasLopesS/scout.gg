@@ -3,7 +3,7 @@
     <div>
       <span class="section-label">Partidas carregadas</span>
       <h2 id="performance-title">Resumo de desempenho</h2>
-      <p>{{ summary.games }} de {{ totalMatches }} partidas na amostra</p>
+      <p>Partidas nos filtros: {{ summary.games }} / {{ totalMatches }} carregadas</p>
     </div>
   </div>
   <div class="performance-filters" role="group" aria-label="Filtros do histórico de partidas">
@@ -34,7 +34,19 @@
       </select>
     </label>
   </div>
-  <p class="filters-note">Os filtros consideram as partidas já carregadas.</p>
+  <div class="sample-scope">
+    <p>
+      O resumo, os gráficos e os filtros consideram apenas partidas já carregadas ({{ totalMatches }}).
+      @if (hasMoreMatches) { Há mais partidas disponíveis para ampliar a análise. }
+      @else { Não há mais partidas disponíveis para carregar. }
+    </p>
+    @if (hasMoreMatches) {
+      <button type="button" [disabled]="loadingMore" (click)="loadMore.emit()">
+        {{ loadingMore ? 'Carregando partidas...' : 'Carregar até 10 partidas' }}
+      </button>
+    }
+  </div>
+  @if (loadMoreError) { <p class="sample-error">{{ loadMoreError }}</p> }
   <div class="performance-metrics">
     <div class="performance-metric"><span>Vitórias</span><strong>{{ summary.wins }} <small>/ {{ summary.games }}</small></strong><small>{{ summary.winRate }}% de aproveitamento</small></div>
     <div class="performance-metric"><span>KDA médio</span><strong>{{ summary.averageKda.toFixed(2) }}</strong><small>(abates + assistências) / mortes</small></div>
