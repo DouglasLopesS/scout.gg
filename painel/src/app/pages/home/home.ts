@@ -7,11 +7,13 @@ import { MatchTrends } from '../../components/match-trends/match-trends';
 import { MatchDetailsPanel } from '../../components/match-details-panel/match-details-panel';
 import { LoadMoreButton } from '../../components/load-more-button/load-more-button';
 import { PlayerSearch } from '../../components/player-search/player-search';
+import { RecentSearches } from '../../components/recent-searches/recent-searches';
 import { PlayerSummary } from '../../components/player-summary/player-summary';
 import { UiState } from '../../components/ui-state/ui-state';
 import type { ApiErrorResponse } from '../../models/player.model';
 import type { SearchState } from '../../models/search-state.model';
 import { PlayerService } from '../../services/player.service';
+import { SearchPreferencesService } from '../../services/search-preferences.service';
 import { summarizeMatches } from '../../shared/match-summary';
 import { regionForPlatform, type PlayerSearchRequest, type RiotPlatform } from '../../shared/riot-routing';
 
@@ -29,6 +31,7 @@ import { regionForPlatform, type PlayerSearchRequest, type RiotPlatform } from '
     MatchDetailsPanel,
     LoadMoreButton,
     PlayerSearch,
+    RecentSearches,
     PlayerSummary,
     UiState
   ],
@@ -37,6 +40,7 @@ import { regionForPlatform, type PlayerSearchRequest, type RiotPlatform } from '
 })
 export class Home {
   private readonly playerService = inject(PlayerService);
+  private readonly searchPreferences = inject(SearchPreferencesService);
   private lastSearch: PlayerSearchRequest | null = null;
   private searchVersion = 0;
   private nextMatchStart = 0;
@@ -46,7 +50,8 @@ export class Home {
   readonly loadingMore = signal(false);
   readonly loadMoreError = signal('');
   readonly activeRiotId = signal('');
-  readonly selectedPlatform = signal<RiotPlatform>('br1');
+  readonly selectedPlatform = this.searchPreferences.platform;
+  readonly recentSearches = this.searchPreferences.recentSearches;
   readonly selectedRegion = computed(() => regionForPlatform(this.selectedPlatform()));
   readonly displayedServer = computed(() => this.state().player?.server ?? {
     platform: this.selectedPlatform(),
@@ -82,7 +87,7 @@ export class Home {
 
   search(riotId: PlayerSearchRequest): void {
     const searchVersion = ++this.searchVersion;
-    this.selectedPlatform.set(riotId.platform);
+    this.searchPreferences.selectPlatform(riotId.platform);
     this.activeRiotId.set(`${riotId.gameName}#${riotId.tagLine}`);
     this.selectedMatchId.set(null);
     this.loadingMore.set(false);
@@ -97,6 +102,11 @@ export class Home {
       .subscribe({
         next: (player) => {
           if (searchVersion !== this.searchVersion) return;
+          this.searchPreferences.rememberSearch({
+            gameName: player.account.gameName,
+            tagLine: player.account.tagLine,
+            platform: player.server.platform
+          });
           this.nextMatchStart = player.matches.length;
           const status = player.matches.length ? 'success' : 'empty';
           this.state.set({ status, player, errorMessage: '' });
@@ -137,7 +147,11 @@ export class Home {
   }
 
   selectPlatform(platform: RiotPlatform): void {
-    this.selectedPlatform.set(platform);
+    this.searchPreferences.selectPlatform(platform);
+  }
+
+  clearRecentSearches(): void {
+    this.searchPreferences.clearRecentSearches();
   }
 
   viewPlayer(riotId: { gameName: string; tagLine: string }): void {

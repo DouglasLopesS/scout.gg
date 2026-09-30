@@ -1,0 +1,12 @@
+:host { display: block; width: min(730px, 100%); margin-top: 14px; }
+.recent-searches { display: flex; align-items: center; flex-wrap: wrap; justify-content: center; gap: 10px; text-align: left; }
+.recent-searches > span { color: var(--text-discreet); font-size: 11px; white-space: nowrap; }
+.recent-searches__items { display: flex; flex-wrap: wrap; justify-content: center; gap: 7px; min-width: 0; }
+.recent-searches__items button { display: inline-flex; align-items: center; gap: 7px; min-width: 0; max-width: 230px; padding: 7px 10px; border: 1px solid var(--border-strong); border-radius: 999px; background: rgba(7, 23, 34, .9); color: var(--text-secondary); font: inherit; font-size: 11px; cursor: pointer; }
+.recent-searches__items button:hover:not(:disabled) { border-color: var(--primary); color: var(--text-primary); }
+.recent-searches__items button:disabled { opacity: .6; cursor: wait; }
+.recent-searches__items button span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.recent-searches__items button small { color: var(--accent); font-size: 9px; font-weight: 700; }
+.recent-searches__clear { padding: 7px 4px; border: 0; background: transparent; color: var(--text-discreet); font: inherit; font-size: 11px; text-decoration: underline; cursor: pointer; }
+.recent-searches__clear:disabled { opacity: .6; cursor: wait; }
+.recent-searches button:focus-visible { outline: 2px solid var(--primary); outline-offset: 3px; }

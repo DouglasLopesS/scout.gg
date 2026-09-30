@@ -17,6 +17,8 @@ O painel permite escolher a plataforma antes da busca. A API deriva a região co
 
 O resumo, os gráficos e os filtros usam somente as partidas já carregadas. O painel mostra quantas partidas aparecem após os filtros e permite carregar até dez partidas adicionais por vez para ampliar a análise.
 
+O navegador guarda o servidor selecionado e até cinco buscas recentes bem-sucedidas no armazenamento local. É possível repetir uma busca pelo atalho abaixo do formulário ou limpar a lista; essas preferências ficam apenas no navegador usado.
+
 ## Stack
 
 | Camada | Tecnologias |

@@ -1,0 +1,13 @@
+<div class="recent-searches" aria-label="Buscas recentes">
+  <span>Buscas recentes</span>
+  <div class="recent-searches__items">
+    @for (recent of searches; track recent.platform + ':' + recent.gameName + '#' + recent.tagLine) {
+      <button type="button" [disabled]="loading" (click)="searchSelected.emit(recent)"
+        [attr.aria-label]="'Pesquisar ' + recent.gameName + '#' + recent.tagLine + ' em ' + recent.platform.toUpperCase()">
+        <span>{{ recent.gameName }}#{{ recent.tagLine }}</span>
+        <small>{{ recent.platform.toUpperCase() }}</small>
+      </button>
+    }
+  </div>
+  <button class="recent-searches__clear" type="button" [disabled]="loading" (click)="cleared.emit()" aria-label="Limpar buscas recentes">Limpar</button>
+</div>

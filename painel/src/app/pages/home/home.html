@@ -24,6 +24,14 @@
         (platformSelected)="selectPlatform($event)"
       />
     </div>
+    @if (recentSearches().length) {
+      <app-recent-searches
+        [searches]="recentSearches()"
+        [loading]="state().status === 'loading'"
+        (searchSelected)="search($event)"
+        (cleared)="clearRecentSearches()"
+      />
+    }
   </section>
 
   <section class="content" aria-live="polite">
