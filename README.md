@@ -11,6 +11,8 @@ O **scout.gg** reúne dados de conta, perfil ranqueado e as dez partidas mais re
 
 As partidas são guardadas em memória na API por até uma hora (máximo de 300 entradas). Buscas simultâneas pelo mesmo ID compartilham uma única chamada, e no máximo três buscas de partidas são feitas à Riot ao mesmo tempo. O cache é limpo ao reiniciar a API.
 
+Ao receber `429` da Riot, a API pausa novas consultas pelo tempo indicado em `Retry-After` e tenta a chamada novamente até duas vezes. Se o cabeçalho estiver ausente ou inválido, aguarda um segundo. Após a última tentativa, devolve o erro `RATE_LIMITED`.
+
 O painel permite escolher a plataforma antes da busca. A API deriva a região correspondente para Account-V1 e Match-V5 e mantém o cache de partidas separado por plataforma/região.
 
 ## Stack

@@ -7,6 +7,7 @@ import type {
   RiotSummonerDto
 } from '../types/riot.types.js';
 import { AppError } from '../utils/app-error.js';
+import { RiotRateLimiter } from '../utils/riot-rate-limiter.js';
 
 const FRIENDLY_ERRORS: Readonly<Record<number, { message: string; code: string }>> = {
   401: { message: 'A chave da Riot é inválida ou expirou.', code: 'RIOT_UNAUTHORIZED' },
@@ -20,7 +21,7 @@ export class RiotClient {
   private readonly platformClient: AxiosInstance;
   private readonly regionalClient: AxiosInstance;
 
-  constructor(config: RiotRouting & { apiKey: string }) {
+  constructor(config: RiotRouting & { apiKey: string }, private readonly rateLimiter = new RiotRateLimiter()) {
     const commonConfig = {
       timeout: 10_000,
       headers: { 'X-Riot-Token': config.apiKey }
@@ -76,7 +77,7 @@ export class RiotClient {
     notFound = FRIENDLY_ERRORS[404]
   ): Promise<T> {
     try {
-      return (await call()).data;
+      return (await this.rateLimiter.execute(call)).data;
     } catch (error: unknown) {
       if (error instanceof AxiosError) {
         const status = error.response?.status ?? 503;
