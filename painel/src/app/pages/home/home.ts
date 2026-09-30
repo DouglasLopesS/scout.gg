@@ -174,7 +174,7 @@ export class Home {
       return body?.error?.message ?? 'Verifique se a API está ativa e tente novamente.';
     }
     if (error instanceof Error && error.name === 'TimeoutError') {
-      return 'A consulta demorou mais de 20 segundos. Verifique o terminal da API.';
+      return 'A consulta demorou mais que o esperado. Verifique o terminal da API.';
     }
     return 'Ocorreu um erro inesperado. Tente novamente.';
   }

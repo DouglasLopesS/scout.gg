@@ -13,7 +13,7 @@ export class PlayerService {
     const tag = encodeURIComponent(tagLine.trim());
     const url = `${environment.apiUrl}/player/${name}/${tag}`;
     return this.http.get<Player>(url).pipe(
-      timeout(20_000)
+      timeout(75_000)
     );
   }
 
@@ -21,7 +21,7 @@ export class PlayerService {
     const id = encodeURIComponent(puuid);
     const url = `${environment.apiUrl}/player/${id}/matches`;
     return this.http.get<PlayerMatchesPage>(url, { params: { start, count } }).pipe(
-      timeout(30_000)
+      timeout(60_000)
     );
   }
 }

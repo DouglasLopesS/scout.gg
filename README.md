@@ -9,6 +9,8 @@ Consulta de perfis e histórico de partidas de League of Legends por Riot ID.
 
 O **scout.gg** reúne dados de conta, perfil ranqueado e as dez partidas mais recentes em uma interface responsiva. Toda comunicação com a Riot API é centralizada na API da aplicação, mantendo a chave privada fora do navegador.
 
+As partidas são guardadas em memória na API por até uma hora (máximo de 300 entradas). Buscas simultâneas pelo mesmo ID compartilham uma única chamada, e no máximo três buscas de partidas são feitas à Riot ao mesmo tempo. O cache é limpo ao reiniciar a API.
+
 ## Stack
 
 | Camada | Tecnologias |
@@ -129,6 +131,7 @@ Todas as falhas seguem o mesmo contrato:
 | `npm run build` | Compila o TypeScript para `dist/` |
 | `npm run start` | Executa a versão compilada |
 | `npm run typecheck` | Valida os tipos sem gerar arquivos |
+| `npm test` | Testa o cache e o limite de chamadas simultâneas |
 
 ### Painel
 
@@ -151,7 +154,6 @@ npm run build
 ## Próximos passos
 
 - Adicionar suporte a outras plataformas e regiões.
-- Introduzir cache para reduzir chamadas externas.
 - Persistir pesquisas e preferências do usuário.
 
 ## Documentação oficial

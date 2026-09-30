@@ -7,6 +7,11 @@ import type {
   RiotSummonerDto
 } from '../types/riot.types.js';
 import { AppError } from '../utils/app-error.js';
+import { CachedRequestQueue } from '../utils/cached-request-queue.js';
+
+const MATCH_REQUEST_CONCURRENCY = 3;
+const MATCH_CACHE_MAX_ENTRIES = 300;
+const MATCH_CACHE_TTL_MS = 60 * 60 * 1000;
 
 const FRIENDLY_ERRORS: Readonly<Record<number, { message: string; code: string }>> = {
   401: { message: 'A chave da Riot é inválida ou expirou.', code: 'RIOT_UNAUTHORIZED' },
@@ -18,6 +23,7 @@ const FRIENDLY_ERRORS: Readonly<Record<number, { message: string; code: string }
 export class RiotClient {
   private readonly platformClient: AxiosInstance;
   private readonly regionalClient: AxiosInstance;
+  private readonly matchRequests: CachedRequestQueue<string, RiotMatchDto>;
 
   constructor(config: AppConfig['riot']) {
     const commonConfig = {
@@ -32,6 +38,14 @@ export class RiotClient {
       ...commonConfig,
       baseURL: `https://${config.region}.api.riotgames.com`
     });
+    this.matchRequests = new CachedRequestQueue(
+      (matchId) => this.request(() => this.regionalClient.get<RiotMatchDto>(
+        `/lol/match/v5/matches/${encodeURIComponent(matchId)}`
+      ), { message: 'Partida não encontrada.', code: 'MATCH_NOT_FOUND' }),
+      MATCH_REQUEST_CONCURRENCY,
+      MATCH_CACHE_MAX_ENTRIES,
+      MATCH_CACHE_TTL_MS
+    );
   }
 
   async getAccountByRiotId(gameName: string, tagLine: string): Promise<RiotAccountDto> {
@@ -60,9 +74,7 @@ export class RiotClient {
   }
 
   async getMatch(matchId: string): Promise<RiotMatchDto> {
-    return this.request(() => this.regionalClient.get<RiotMatchDto>(
-      `/lol/match/v5/matches/${encodeURIComponent(matchId)}`
-    ), { message: 'Partida não encontrada.', code: 'MATCH_NOT_FOUND' });
+    return this.matchRequests.get(matchId);
   }
 
   private async request<T>(
