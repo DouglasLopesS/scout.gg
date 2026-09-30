@@ -44,15 +44,22 @@
             message="O perfil foi encontrado, mas não há partidas disponíveis para análise."
           />
         } @else {
+          <app-match-performance
+            [summary]="matchSummary()"
+            [totalMatches]="player.matches.length"
+            [queues]="queueOptions()"
+            [selectedQueueId]="selectedQueueId()"
+            (queueSelected)="selectQueue($event)"
+          />
           <div class="history-heading">
             <div>
               <span class="section-label">Desempenho recente</span>
               <h2>Histórico de partidas</h2>
             </div>
-            <span class="match-count">{{ player.matches.length }} partidas analisadas</span>
+            <span class="match-count">{{ visibleMatches().length }} partidas exibidas</span>
           </div>
           <div class="matches">
-            @for (match of player.matches; track match.id) {
+            @for (match of visibleMatches(); track match.id) {
               <app-match-card
                 [match]="match"
                 [selected]="selectedMatchId() === match.id"

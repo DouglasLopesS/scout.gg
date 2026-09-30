@@ -1,0 +1,40 @@
+<section class="performance-summary" aria-labelledby="performance-title">
+  <div class="performance-heading">
+    <div>
+      <span class="section-label">Partidas carregadas</span>
+      <h2 id="performance-title">Resumo de desempenho</h2>
+      <p>{{ summary.games }} de {{ totalMatches }} partidas na amostra</p>
+    </div>
+    <label class="queue-filter">
+      <span>Filtrar por fila</span>
+      <select [value]="selectedQueueId ?? 'all'" (change)="selectQueue($event)">
+        <option value="all">Todas as filas</option>
+        @for (queue of queues; track queue.id) {
+          <option [value]="queue.id">{{ queue.name }}</option>
+        }
+      </select>
+    </label>
+  </div>
+  <div class="performance-metrics">
+    <div class="performance-metric"><span>Vitórias</span><strong>{{ summary.wins }} <small>/ {{ summary.games }}</small></strong><small>{{ summary.winRate }}% de aproveitamento</small></div>
+    <div class="performance-metric"><span>KDA médio</span><strong>{{ summary.averageKda.toFixed(2) }}</strong><small>(abates + assistências) / mortes</small></div>
+    <div class="performance-metric"><span>CS/min</span><strong>{{ summary.csPerMinute.toFixed(1) }}</strong><small>farm por minuto jogado</small></div>
+    <div class="performance-metric"><span>Dano médio</span><strong>{{ formatNumber(summary.averageDamage) }}</strong><small>a campeões por partida</small></div>
+  </div>
+  <div class="top-champions">
+    <h3>Campeões mais jogados</h3>
+    @if (summary.champions.length) {
+      <div class="top-champions__list">
+        @for (champion of summary.champions; track champion.id) {
+          <div class="top-champion">
+            <img [src]="champion.icon" [alt]="champion.name" />
+            <strong>{{ champion.name }}</strong>
+            <span>{{ champion.games }} {{ champion.games === 1 ? 'partida' : 'partidas' }} · {{ champion.wins }} vitórias</span>
+          </div>
+        }
+      </div>
+    } @else {
+      <p>Nenhuma partida carregada nesta fila.</p>
+    }
+  </div>
+</section>

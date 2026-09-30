@@ -1,7 +1,8 @@
 import { HttpErrorResponse } from '@angular/common/http';
-import { Component, inject, signal } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
 import { LucideActivity, LucideChartNoAxesColumnIncreasing, LucideRadar, LucideSearch, LucideUserRoundSearch } from '@lucide/angular';
 import { MatchCard } from '../../components/match-card/match-card';
+import { MatchPerformance } from '../../components/match-performance/match-performance';
 import { MatchDetailsPanel } from '../../components/match-details-panel/match-details-panel';
 import { LoadMoreButton } from '../../components/load-more-button/load-more-button';
 import { PlayerSearch } from '../../components/player-search/player-search';
@@ -10,6 +11,7 @@ import { UiState } from '../../components/ui-state/ui-state';
 import type { ApiErrorResponse } from '../../models/player.model';
 import type { SearchState } from '../../models/search-state.model';
 import { PlayerService } from '../../services/player.service';
+import { summarizeMatches } from '../../shared/match-summary';
 
 @Component({
   selector: 'app-home',
@@ -20,6 +22,7 @@ import { PlayerService } from '../../services/player.service';
     LucideSearch,
     LucideUserRoundSearch,
     MatchCard,
+    MatchPerformance,
     MatchDetailsPanel,
     LoadMoreButton,
     PlayerSearch,
@@ -38,12 +41,26 @@ export class Home {
   readonly loadingMore = signal(false);
   readonly loadMoreError = signal('');
   readonly activeRiotId = signal('');
+  readonly selectedQueueId = signal<number | null>(null);
+  readonly queueOptions = computed(() => {
+    const matches = this.state().player?.matches ?? [];
+    const queues = new Map<number, string>();
+    for (const match of matches) queues.set(match.queueId, match.queueName);
+    return [...queues].map(([id, name]) => ({ id, name })).sort((a, b) => a.name.localeCompare(b.name, 'pt-BR'));
+  });
+  readonly visibleMatches = computed(() => {
+    const matches = this.state().player?.matches ?? [];
+    const queueId = this.selectedQueueId();
+    return queueId === null ? matches : matches.filter((match) => match.queueId === queueId);
+  });
+  readonly matchSummary = computed(() => summarizeMatches(this.visibleMatches()));
 
   search(riotId: { gameName: string; tagLine: string }): void {
     this.activeRiotId.set(`${riotId.gameName}#${riotId.tagLine}`);
     this.selectedMatchId.set(null);
     this.loadingMore.set(false);
     this.loadMoreError.set('');
+    this.selectedQueueId.set(null);
     this.lastSearch = riotId;
     this.state.set({ status: 'loading', player: null, errorMessage: '' });
     this.playerService.findByRiotId(riotId.gameName, riotId.tagLine)
@@ -68,6 +85,11 @@ export class Home {
   }
 
   closeMatch(): void {
+    this.selectedMatchId.set(null);
+  }
+
+  selectQueue(queueId: number | null): void {
+    this.selectedQueueId.set(queueId);
     this.selectedMatchId.set(null);
   }
 
