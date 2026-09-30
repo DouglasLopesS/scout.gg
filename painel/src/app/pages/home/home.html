@@ -56,6 +56,9 @@
             (championSelected)="selectChampion($event)"
             (resultSelected)="selectResult($event)"
           />
+          @if (visibleMatches().length > 0) {
+            <app-match-trends [matches]="visibleMatches()" />
+          }
           <div class="history-heading">
             <div>
               <span class="section-label">Desempenho recente</span>

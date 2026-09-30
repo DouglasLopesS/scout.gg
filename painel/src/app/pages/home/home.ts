@@ -3,6 +3,7 @@ import { Component, computed, inject, signal } from '@angular/core';
 import { LucideActivity, LucideChartNoAxesColumnIncreasing, LucideRadar, LucideSearch, LucideUserRoundSearch } from '@lucide/angular';
 import { MatchCard } from '../../components/match-card/match-card';
 import { MatchPerformance } from '../../components/match-performance/match-performance';
+import { MatchTrends } from '../../components/match-trends/match-trends';
 import { MatchDetailsPanel } from '../../components/match-details-panel/match-details-panel';
 import { LoadMoreButton } from '../../components/load-more-button/load-more-button';
 import { PlayerSearch } from '../../components/player-search/player-search';
@@ -23,6 +24,7 @@ import { summarizeMatches } from '../../shared/match-summary';
     LucideUserRoundSearch,
     MatchCard,
     MatchPerformance,
+    MatchTrends,
     MatchDetailsPanel,
     LoadMoreButton,
     PlayerSearch,

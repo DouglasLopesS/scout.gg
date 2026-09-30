@@ -1,0 +1,56 @@
+:host { display: block; min-width: 0; width: 100%; max-width: 100%; }
+
+.trends {
+  min-width: 0;
+  max-width: 100%;
+  padding: 24px;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  background: linear-gradient(135deg, rgba(15, 33, 48, .97), rgba(8, 20, 31, .98));
+  box-shadow: var(--shadow-card);
+}
+
+.trends-heading { display: flex; align-items: end; justify-content: space-between; gap: 16px; }
+.section-label { color: var(--accent); font-size: 10px; font-weight: 700; letter-spacing: .09em; text-transform: uppercase; }
+.trends-heading h2 { margin: 6px 0 0; color: var(--text-primary); font-family: var(--font-display); font-size: 25px; font-weight: 500; }
+.trends-heading > span { color: var(--text-discreet); font-size: 11px; text-align: right; }
+.trends-hint { margin: 9px 0 0; color: var(--text-discreet); font-size: 10px; }
+.trends-grid { display: grid; min-width: 0; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; margin-top: 20px; }
+
+.trend-card {
+  --trend-color: var(--primary);
+  min-width: 0;
+  padding: 16px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: rgba(3, 13, 21, .42);
+}
+
+.trend-card--cs { --trend-color: var(--accent); }
+.trend-card--damage { --trend-color: var(--secondary); }
+.trend-card__heading { display: flex; align-items: start; justify-content: space-between; gap: 8px; }
+.trend-card__heading h3 { margin: 0; color: var(--text-primary); font-size: 14px; font-weight: 650; }
+.trend-card__heading p { margin: 4px 0 0; color: var(--text-discreet); font-size: 10px; line-height: 1.4; }
+.trend-card__heading strong { color: var(--trend-color); font-family: var(--font-display); font-size: 19px; font-weight: 500; white-space: nowrap; }
+
+.trend-plot { display: grid; width: 100%; min-width: 0; grid-template-columns: 42px minmax(0, 1fr); gap: 4px; height: 150px; margin-top: 15px; }
+.trend-plot__scale { display: flex; min-width: 0; flex-direction: column; justify-content: space-between; padding: 15px 0 17px; color: var(--text-discreet); font-size: 9px; text-align: right; }
+.trend-canvas { position: relative; min-width: 0; width: 100%; height: 150px; overflow: hidden; }
+.trend-canvas svg { position: absolute; inset: 0; display: block; width: 100%; height: 100%; overflow: hidden; }
+.grid-line { stroke: var(--border); stroke-width: 1; stroke-dasharray: 4 5; }
+.trend-line { fill: none; stroke: var(--trend-color); stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; vector-effect: non-scaling-stroke; }
+.trend-point { fill: var(--trend-color); stroke: #06141f; stroke-width: 2; vector-effect: non-scaling-stroke; }
+.trend-hit { fill: transparent; stroke: transparent; stroke-width: 12; vector-effect: non-scaling-stroke; }
+.trend-target { cursor: pointer; }
+.trend-target:focus-visible { outline: none; }
+.trend-target:hover .trend-point, .trend-target:focus .trend-point { stroke: var(--text-primary); stroke-width: 3; }
+.trend-tooltip { position: absolute; z-index: 1; top: 4px; left: 50%; max-width: calc(100% - 16px); padding: 7px 10px; transform: translateX(-50%); border: 1px solid var(--border-strong); border-radius: 8px; background: #071723; box-shadow: 0 8px 22px rgba(0, 0, 0, .3); color: var(--text-primary); font-size: 11px; line-height: 1.35; text-align: center; pointer-events: none; }
+.trend-axis { display: flex; justify-content: space-between; padding-left: 46px; color: var(--text-discreet); font-size: 9px; }
+.trend-values { margin-top: 14px; color: var(--text-discreet); font-size: 10px; }
+.trend-values summary { width: fit-content; cursor: pointer; }
+.trend-values summary:focus-visible { outline: 2px solid var(--primary); outline-offset: 3px; }
+.trend-values ol { max-height: 150px; overflow: auto; margin: 8px 0 0; padding-left: 20px; line-height: 1.7; }
+.trend-empty { min-height: 150px; display: grid; place-items: center; margin: 15px 0 0; color: var(--text-discreet); font-size: 11px; text-align: center; }
+
+@media (max-width: 950px) { .trends-grid { grid-template-columns: 1fr; } }
+@media (max-width: 600px) { .trends { padding: 18px; } .trends-heading { align-items: start; flex-direction: column; } .trends-heading > span { text-align: left; } }

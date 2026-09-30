@@ -1,0 +1,72 @@
+<section class="trends" aria-labelledby="trends-title">
+  <div class="trends-heading">
+    <div>
+      <span class="section-label">Desempenho ao longo do tempo</span>
+      <h2 id="trends-title">Evolução por partida</h2>
+    </div>
+    <span>Até {{ analyzedCount() }} partidas filtradas · da mais antiga à mais recente</span>
+  </div>
+  <p class="trends-hint">Passe o mouse, toque ou foque um ponto para ver o valor da partida.</p>
+
+  <div class="trends-grid">
+    @for (chart of charts(); track chart.key) {
+      <article class="trend-card" [class.trend-card--kda]="chart.key === 'kda'" [class.trend-card--cs]="chart.key === 'cs'" [class.trend-card--damage]="chart.key === 'damage'">
+        <div class="trend-card__heading">
+          <div>
+            <h3>{{ chart.title }}</h3>
+            <p>{{ chart.description }}</p>
+          </div>
+          <strong>{{ chart.latestLabel }}</strong>
+        </div>
+
+        @if (chart.points.length) {
+          <div class="trend-plot">
+            <div class="trend-plot__scale"><span>{{ chart.topLabel }}</span><span>0</span></div>
+            <div class="trend-canvas">
+              <svg viewBox="0 0 400 150" preserveAspectRatio="none" role="group" [attr.aria-label]="chart.description + ', da mais antiga à mais recente'">
+                <line x1="20" y1="20" x2="380" y2="20" class="grid-line" />
+                <line x1="20" y1="75" x2="380" y2="75" class="grid-line" />
+                <line x1="20" y1="130" x2="380" y2="130" class="grid-line" />
+                <polyline [attr.points]="chart.line" class="trend-line" />
+                @for (point of chart.points; track point.matchId) {
+                  <g
+                    class="trend-target"
+                    role="button"
+                    tabindex="0"
+                    [attr.aria-label]="point.label"
+                    (mouseenter)="showPoint(chart.key, point)"
+                    (mouseleave)="hidePoint()"
+                    (focus)="showPoint(chart.key, point)"
+                    (blur)="hidePoint()"
+                    (click)="togglePoint(chart.key, point)"
+                    (keydown.enter)="togglePoint(chart.key, point)"
+                    (keydown.space)="$event.preventDefault(); togglePoint(chart.key, point)"
+                  >
+                    <circle [attr.cx]="point.x" [attr.cy]="point.y" r="12" class="trend-hit" />
+                    <circle [attr.cx]="point.x" [attr.cy]="point.y" r="4.5" class="trend-point" />
+                  </g>
+                }
+              </svg>
+              @if (activePoint(); as active) {
+                @if (active.chartKey === chart.key) {
+                  <div class="trend-tooltip" role="status">{{ active.label }}</div>
+                }
+              }
+            </div>
+          </div>
+          <div class="trend-axis"><span>Mais antiga</span><span>Mais recente</span></div>
+          <details class="trend-values">
+            <summary>Ver valores das partidas</summary>
+            <ol>
+              @for (point of chart.points; track point.matchId) {
+                <li>{{ point.label }}</li>
+              }
+            </ol>
+          </details>
+        } @else {
+          <p class="trend-empty">Não há dados válidos para este indicador nas partidas filtradas.</p>
+        }
+      </article>
+    }
+  </div>
+</section>
